@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FY25 vs FY26 AEI Validations — YoY Comparison</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a1929;
+    --bg-card: #0f2236;
+    --bg-card-2: #122a42;
+    --card-border: rgba(255,255,255,0.10);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.62);
+    --cisco-blue: #02C8FF;
+    --accent-magenta: #FF007F;
+    --accent-orange: #FF9000;
+    --accent-purple: #B36BFF;
+    --status-green: #3DDC84;
+    --status-red: #FF4D4F;
+    --status-yellow: #FFD93D;
+    --fy25: #B36BFF;
+    --fy26: #02C8FF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, #061322 0%, #0a1929 40%, #0a1929 100%);
+    color: var(--text);
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  header {
+    padding: 32px 48px 22px;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(2,200,255,0.08), transparent);
+  }
+  .eyebrow {
+    color: var(--cisco-blue);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.95rem; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 0.95rem; max-width: 980px; }
+  .year-key { display: inline-flex; gap: 16px; margin-top: 12px; font-size: 0.78rem; color: var(--muted); }
+  .year-key .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+  main { padding: 28px 48px 64px; max-width: 1520px; margin: 0 auto; }
+  section { margin-bottom: 34px; }
+  h2 {
+    font-size: 1.0rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--cisco-blue);
+    margin: 0 0 14px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 8px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  h2 .h2-sub { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: none; }
+  .grid { display: grid; gap: 16px; }
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr 1fr; }
+  .chart-row { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .chart-row { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .yoy-kpi { padding: 18px 20px; }
+  .yoy-kpi .label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .yoy-kpi .row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .yoy-kpi .row .yr { font-size: 0.7rem; color: var(--muted); }
+  .yoy-kpi .row .val { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.01em; }
+  .yoy-kpi .row.fy25 .val { color: var(--fy25); }
+  .yoy-kpi .row.fy26 .val { color: var(--fy26); }
+  .yoy-kpi .delta {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed rgba(255,255,255,0.10);
+    font-size: 0.82rem; font-weight: 700;
+  }
+  .delta.down { color: var(--status-green); }
+  .delta.up { color: var(--status-red); }
+  .delta.neutral { color: var(--muted); }
+  .chart-card { min-height: 360px; }
+  .chart-card .chart-wrap { position: relative; height: 320px; }
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  table.tbl th, table.tbl td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  table.tbl th {
+    color: var(--muted); font-weight: 600; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  table.tbl td.num, table.tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.tbl tr.total td { font-weight: 700; border-top: 1px solid rgba(255,255,255,0.18); border-bottom: none; }
+  td.fy25val { color: var(--fy25); font-weight: 600; }
+  td.fy26val { color: var(--fy26); font-weight: 600; }
+  td.deltacell { font-weight: 700; }
+  td.deltacell.down { color: var(--status-green); }
+  td.deltacell.up { color: var(--status-red); }
+  td.deltacell.flat { color: var(--muted); }
+  .callout {
+    background: linear-gradient(135deg, rgba(2,200,255,0.10), rgba(179,107,255,0.08));
+    border: 1px solid rgba(2,200,255,0.25);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.9rem;
+  }
+  .callout strong { color: var(--cisco-blue); }
+  .insight-grid { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 1100px) { .insight-grid { grid-template-columns: 1fr; } }
+  .insight {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-left: 3px solid var(--status-green);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .insight.warn { border-left-color: var(--accent-orange); }
+  .insight.alert { border-left-color: var(--status-red); }
+  .insight .ititle { font-weight: 700; font-size: 0.92rem; margin: 0 0 6px; }
+  .insight .imetric { font-size: 1.2rem; font-weight: 800; margin: 4px 0 6px; }
+  .insight.warn .imetric { color: var(--accent-orange); }
+  .insight.alert .imetric { color: var(--status-red); }
+  .insight:not(.warn):not(.alert) .imetric { color: var(--status-green); }
+  .insight p { margin: 0; font-size: 0.82rem; color: var(--muted); }
+  .footnote { color: var(--muted); font-size: 0.74rem; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">AEI Validations · YoY Comparison · FY25 vs FY26</div>
+  <h1>Disputes down 46%, value down 24% — but a few categories moved the other way</h1>
+  <div class="sub">Side-by-side comparison of dispute volume, ATR value, category mix, theatre split and remediation scenarios across FY25 ($2.1B / 10,844 cases) and FY26 ($1.59B / 5,879 cases).</div>
+  <div class="year-key">
+    <span><span class="swatch" style="background:var(--fy25);"></span>FY25</span>
+    <span><span class="swatch" style="background:var(--fy26);"></span>FY26</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== HEADLINE YoY KPIS ===================== -->
+  <section>
+    <h2>Headline movement <span class="h2-sub">FY25 → FY26 deltas at a worldwide level</span></h2>
+    <div class="grid kpi-grid">
+      <div class="card yoy-kpi">
+        <div class="label">Total Disputes</div>
+        <div class="row fy25"><span class="yr">FY25</span><span class="val">10,844</span></div>
+        <div class="row fy26"><span class="yr">FY26</span><span class="val">5,879</span></div>
+        <div class="delta down">▼ 4,965 cases · −46%</div>
+      </div>
+      <div class="card yoy-kpi">
+        <div class="label">Total ATR Disputed</div>
+        <div class="row fy25"><span class="yr">FY25</span><span class="val">$2.10B</span></div>
+        <div class="row fy26"><span class="yr">FY26</span><span class="val">$1.59B</span></div>
+        <div class="delta down">▼ $510M · −24%</div>
+      </div>
+      <div class="card yoy-kpi">
+        <div class="label">Valid ATR (kept in goaling)</div>
+        <div class="row fy25"><span class="yr">FY25</span><span class="val">$1.44B</span></div>
+        <div class="row fy26"><span class="yr">FY26</span><span class="val">$1.04B</span></div>
+        <div class="delta neutral">Share: 67% → 65% (−2 pts)</div>
+      </div>
+      <div class="card yoy-kpi">
+        <div class="label">ATR Under Review</div>
+        <div class="row fy25"><span class="yr">FY25</span><span class="val">$73.4M</span></div>
+        <div class="row fy26"><span class="yr">FY26</span><span class="val">$39.6M</span></div>
+        <div class="delta down">▼ $33.8M · −46%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== THEATRE COMPARISON ===================== -->
+  <section>
+    <h2>Theatre comparison <span class="h2-sub">Disputed value and case volume side-by-side</span></h2>
+    <div class="grid chart-row">
+      <div class="card chart-card">
+        <div style="font-weight:700; margin-bottom:8px;">ATR by Theatre ($M)</div>
+        <div class="chart-wrap"><canvas id="theatreValueChart"></canvas></div>
+      </div>
+      <div class="card chart-card">
+        <div style="font-weight:700; margin-bottom:8px;">Disputes by Theatre (count)</div>
+        <div class="chart-wrap"><canvas id="theatreCountChart"></canvas></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Theatre</th>
+            <th class="num">FY25 Disputes</th>
+            <th class="num">FY26 Disputes</th>
+            <th class="num">Δ Disputes</th>
+            <th class="num">FY25 ATR</th>
+            <th class="num">FY26 ATR</th>
+            <th class="num">Δ ATR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Americas</td><td class="num fy25val">6,617</td><td class="num fy26val">2,669</td><td class="num deltacell down">−60%</td><td class="num fy25val">$1,200M</td><td class="num fy26val">$830M</td><td class="num deltacell down">−31%</td></tr>
+          <tr><td>EMEA</td><td class="num fy25val">2,734</td><td class="num fy26val">2,345</td><td class="num deltacell down">−14%</td><td class="num fy25val">$522.5M</td><td class="num fy26val">$503M</td><td class="num deltacell flat">−4%</td></tr>
+          <tr><td>APJC</td><td class="num fy25val">1,493</td><td class="num fy26val">865</td><td class="num deltacell down">−42%</td><td class="num fy25val">$314.7M</td><td class="num fy26val">$262M</td><td class="num deltacell down">−17%</td></tr>
+          <tr class="total"><td>Worldwide</td><td class="num">10,844</td><td class="num">5,879</td><td class="num deltacell down">−46%</td><td class="num">$2,100M</td><td class="num">$1,590M</td><td class="num deltacell down">−24%</td></tr>
+        </tbody>
+      </table>
+      <div class="footnote">Americas drove most of the volume reduction (–3,948 cases). EMEA's value held nearly flat — value-per-dispute rose from $191K to $214K.</div>
+    </div>
+  </section>
+
+  <!-- ===================== CATEGORY COMPARISON ===================== -->
+  <section>
+    <h2>Category comparison <span class="h2-sub">Root-cause categories WW · $M</span></h2>
+    <div class="card chart-card" style="min-height:420px;">
+      <div class="chart-wrap" style="height:380px;"><canvas id="categoryCompareChart"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th class="num">FY25</th>
+            <th class="num">FY26</th>
+            <th class="num">Δ ($M)</th>
+            <th class="num">Δ (%)</th>
+            <th>Direction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Valid ATR</td><td class="num fy25val">$1,443.0</td><td class="num fy26val">$1,041.0</td><td class="num deltacell down">−$402.0</td><td class="num deltacell down">−28%</td><td>Lower disputed base</td></tr>
+          <tr><td>Account / Customer Mapping Change</td><td class="num fy25val">$196.5</td><td class="num fy26val">$167.8</td><td class="num deltacell down">−$28.7</td><td class="num deltacell down">−15%</td><td>Improvement</td></tr>
+          <tr><td>Deal / Contract Exclusion</td><td class="num fy25val">$161.8</td><td class="num fy26val">$136.5</td><td class="num deltacell down">−$25.3</td><td class="num deltacell down">−16%</td><td>Improvement</td></tr>
+          <tr><td>Asset Management</td><td class="num fy25val">$80.2</td><td class="num fy26val">$120.3</td><td class="num deltacell up">+$40.1</td><td class="num deltacell up">+50%</td><td>Watch — increased</td></tr>
+          <tr><td>ATR Under Review</td><td class="num fy25val">$73.4</td><td class="num fy26val">$39.6</td><td class="num deltacell down">−$33.8</td><td class="num deltacell down">−46%</td><td>Improvement</td></tr>
+          <tr><td>EA (ALC → EA)</td><td class="num fy25val">$64.9</td><td class="num fy26val">$38.2</td><td class="num deltacell down">−$26.7</td><td class="num deltacell down">−41%</td><td>Improvement</td></tr>
+          <tr><td>WPA</td><td class="num fy25val">$44.1</td><td class="num fy26val">$38.6</td><td class="num deltacell down">−$5.5</td><td class="num deltacell down">−12%</td><td>Improvement</td></tr>
+          <tr><td>SFC / NFP / Pay-as-you-go</td><td class="num fy25val">$39.8</td><td class="num fy26val">$1.7</td><td class="num deltacell down">−$38.1</td><td class="num deltacell down">−96%</td><td>Big improvement</td></tr>
+          <tr><td>Incorrect Contract / Order data</td><td class="num fy25val">$11.5</td><td class="num fy26val">$6.6</td><td class="num deltacell down">−$4.9</td><td class="num deltacell down">−43%</td><td>Improvement</td></tr>
+          <tr><td>SPNA</td><td class="num fy25val">$3.4</td><td class="num fy26val">$3.5</td><td class="num deltacell flat">+$0.1</td><td class="num deltacell flat">+3%</td><td>Flat</td></tr>
+          <tr class="total"><td>Total</td><td class="num">$2,118.6</td><td class="num">$1,593.8</td><td class="num deltacell down">−$524.8</td><td class="num deltacell down">−25%</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== SCENARIO COMPARISON ===================== -->
+  <section>
+    <h2>Scenario comparison <span class="h2-sub">Remediation buckets — value handled per scenario</span></h2>
+    <div class="grid two-col">
+      <div class="card chart-card">
+        <div style="font-weight:700; margin-bottom:8px;">$M handled per scenario</div>
+        <div class="chart-wrap"><canvas id="scenarioChart"></canvas></div>
+      </div>
+      <div class="card">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Scenario</th>
+              <th class="num">FY25</th>
+              <th class="num">FY26</th>
+              <th class="num">Δ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Non-Renewable / Non-Recurring</td><td class="num fy25val">$142.1M<br><span class="footnote" style="margin:0;">443 cases</span></td><td class="num fy26val">$220.0M<br><span class="footnote" style="margin:0;">422 cases</span></td><td class="num deltacell up">+55%</td></tr>
+            <tr><td>Collab (XaaS Replace/Modify)</td><td class="num fy25val">$63.6M</td><td class="num fy26val">$143.8M</td><td class="num deltacell up">+126%</td></tr>
+            <tr><td>Decommission</td><td class="num fy25val">$119.2M<br><span class="footnote" style="margin:0;">517 cases</span></td><td class="num fy26val">$68.9M<br><span class="footnote" style="margin:0;">496 cases</span></td><td class="num deltacell down">−42%</td></tr>
+            <tr><td>ALC → EA Threading</td><td class="num fy25val">$105.1M</td><td class="num fy26val">$40.5M</td><td class="num deltacell down">−61%</td></tr>
+            <tr><td>WPA</td><td class="num fy25val">$44.1M</td><td class="num fy26val">$14.6M</td><td class="num deltacell down">−67%</td></tr>
+            <tr><td>LDOS (FY25 only)</td><td class="num fy25val">$89.4M</td><td class="num fy26val">—</td><td class="num deltacell flat">N/R</td></tr>
+            <tr><td>TSS-SBP (FY26 only)</td><td class="num fy25val">—</td><td class="num fy26val">$59.0M</td><td class="num deltacell flat">New</td></tr>
+            <tr><td>SPNA</td><td class="num fy25val">$3.4M</td><td class="num fy26val">$0.5M</td><td class="num deltacell down">−85%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== KEY INSIGHTS ===================== -->
+  <section>
+    <h2>What changed — leadership insights</h2>
+    <div class="grid insight-grid">
+      <div class="insight">
+        <div class="ititle">Dispute volume halved</div>
+        <div class="imetric">−46%</div>
+        <p>Cases dropped from 10,844 to 5,879. Driven mainly by Americas (−60%) — earlier-cycle data threading and Account/Customer mapping fixes are reducing recurring dispute patterns.</p>
+      </div>
+      <div class="insight">
+        <div class="ititle">Open backlog cut nearly in half</div>
+        <div class="imetric">$73.4M → $39.6M</div>
+        <p>ATR Under Review dropped −46% YoY. Validation throughput improved despite a smaller team window.</p>
+      </div>
+      <div class="insight">
+        <div class="ititle">SFC/NFP/PAYG nearly eliminated</div>
+        <div class="imetric">−96%</div>
+        <p>$39.8M → $1.7M. Upstream classification at order capture is now catching these before they become disputes.</p>
+      </div>
+      <div class="insight warn">
+        <div class="ititle">Asset Management cases rising</div>
+        <div class="imetric">+50% ($80M → $120M)</div>
+        <p>The only major category moving the wrong direction. CX decommission &amp; lifecycle data hygiene with Asset Managers is the focus area.</p>
+      </div>
+      <div class="insight warn">
+        <div class="ititle">Collab cleanup more than doubled</div>
+        <div class="imetric">+126% ($63.6M → $143.8M)</div>
+        <p>XaaS Replace/Modify ATR cleanup expanded materially — now multi-quarter (FY26 + FY27Q1) and proactive vs reactive.</p>
+      </div>
+      <div class="insight warn">
+        <div class="ititle">Non-Renewable value jumped</div>
+        <div class="imetric">+55% ($142M → $220M)</div>
+        <p>Case count is flat (443 → 422) but ATR per case nearly doubled — fewer, larger non-renewable disputes (Kaiser, Intel, Truist, DoS).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EMERGING / RETIRED ===================== -->
+  <section>
+    <h2>Emerging &amp; retired scenarios <span class="h2-sub">What's new in FY26 and what dropped off</span></h2>
+    <div class="grid two-col">
+      <div class="card" style="border-left:3px solid var(--cisco-blue);">
+        <div style="font-weight:700; color:var(--cisco-blue); margin-bottom:8px;">New in FY26</div>
+        <ul style="margin:0; padding-left:18px; color:rgba(255,255,255,0.85); font-size:0.88rem;">
+          <li><strong>TSS-SBP ($59M)</strong> — Threaded to CXEA / CXWPA; APPD in BCS removed with approval.</li>
+          <li><strong>Offer Migration handling (CX EA, CX WPA)</strong> — Data Foundation pre/post attributed data updated.</li>
+          <li><strong>CXEA DNR marking</strong> via SCM Team partnership.</li>
+          <li><strong>APPD in LCS exclusion</strong> with Finance approval.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:3px solid var(--accent-purple);">
+        <div style="font-weight:700; color:var(--accent-purple); margin-bottom:8px;">Reported in FY25, absent from FY26 readout</div>
+        <ul style="margin:0; padding-left:18px; color:rgba(255,255,255,0.85); font-size:0.88rem;">
+          <li><strong>LDOS ($89.4M, 305 disputes)</strong> — Was a Valid ATR bucket excluded from goaling. Likely now classified upstream or merged into Valid ATR.</li>
+          <li><strong>"Sample Valid Scenarios" matrix</strong> (Credit-in-ATR, Different business entity, Subscription modified) — replaced by the New Scenarios narrative in FY26.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FEEDBACK STATUS ===================== -->
+  <section>
+    <h2>Tool feedback status <span class="h2-sub">Which FY25 asks were addressed by FY26</span></h2>
+    <div class="card">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>FY25 Feedback Item</th>
+            <th>Status in FY26 Readout</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Add categories: ATR Under Review, Invalid Dispute / User Training</td><td><span style="color:var(--status-yellow);">⚠ Partially — "ATR Under Review" now tracked as a category; "Invalid Dispute / User Training" still requested.</span></td></tr>
+          <tr><td>ATR view data reviewed &amp; categorized before upload (LDOS, ALC-EA, WPA…)</td><td><span style="color:var(--status-yellow);">⚠ Still open — re-raised in FY26.</span></td></tr>
+          <tr><td>Download capability for all AEI analysts</td><td><span style="color:var(--status-red);">✗ Replaced by broader "website performance &amp; download issues at peak" complaint.</span></td></tr>
+          <tr><td>Merge multiple ATR lines · filter-aware report · bulk upload</td><td><span style="color:var(--muted);">— Not specifically re-cited in FY26.</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== BOTTOM CALLOUT ===================== -->
+  <section>
+    <div class="callout">
+      <strong>Bottom line:</strong> FY26 is a materially healthier picture — disputes <strong>−46%</strong>, disputed value <strong>−24%</strong>, open backlog <strong>−46%</strong>, and SFC/NFP/PAYG nearly eliminated. Two pockets need focus: <strong>Asset Management (+50%)</strong> and <strong>Collab XaaS cleanup (+126%)</strong>, both signalling lifecycle &amp; offer-migration data hygiene is the next investment area. Americas continues to dominate (52–59% of value) but contributed most of the YoY improvement.
+    </div>
+  </section>
+
+</main>
+
+<script>
+  Chart.defaults.color = 'rgba(255,255,255,0.72)';
+  Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+
+  const FY25 = '#B36BFF';
+  const FY26 = '#02C8FF';
+
+  // Theatre value
+  new Chart(document.getElementById('theatreValueChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Americas', 'EMEA', 'APJC'],
+      datasets: [
+        { label: 'FY25', data: [1200, 522.5, 314.7], backgroundColor: FY25, borderRadius: 4 },
+        { label: 'FY26', data: [830, 503, 262], backgroundColor: FY26, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.y}M` } }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: v => '$' + v + 'M' } }
+      }
+    }
+  });
+
+  // Theatre count
+  new Chart(document.getElementById('theatreCountChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Americas', 'EMEA', 'APJC'],
+      datasets: [
+        { label: 'FY25', data: [6617, 2734, 1493], backgroundColor: FY25, borderRadius: 4 },
+        { label: 'FY26', data: [2669, 2345, 865], backgroundColor: FY26, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y.toLocaleString()} cases` } }
+      },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: v => v.toLocaleString() } }
+      }
+    }
+  });
+
+  // Category compare (grouped bars, log scale)
+  new Chart(document.getElementById('categoryCompareChart'), {
+    type: 'bar',
+    data: {
+      labels: [
+        'Valid ATR', 'Account/Cust Mapping', 'Deal/Contract Excl', 'Asset Mgmt',
+        'Under Review', 'EA', 'WPA', 'SFC/NFP/PAYG', 'Incorrect Contract', 'SPNA'
+      ],
+      datasets: [
+        { label: 'FY25', data: [1443, 196.5, 161.8, 80.2, 73.4, 64.9, 44.1, 39.8, 11.5, 3.4], backgroundColor: FY25, borderRadius: 4 },
+        { label: 'FY26', data: [1041, 167.8, 136.5, 120.3, 39.6, 38.2, 38.6, 1.7, 6.6, 3.5], backgroundColor: FY26, borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.y}M` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: {
+          type: 'logarithmic',
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { callback: v => '$' + v + 'M' }
+        }
+      }
+    }
+  });
+
+  // Scenario compare
+  new Chart(document.getElementById('scenarioChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Non-Renewable', 'Collab', 'Decommission', 'ALC→EA', 'WPA', 'LDOS', 'TSS-SBP', 'SPNA'],
+      datasets: [
+        { label: 'FY25', data: [142.1, 63.6, 119.2, 105.1, 44.1, 89.4, 0, 3.4], backgroundColor: FY25, borderRadius: 4 },
+        { label: 'FY26', data: [220.0, 143.8, 68.9, 40.5, 14.6, 0, 59.0, 0.5], backgroundColor: FY26, borderRadius: 4 }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.x}M` } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: v => '$' + v + 'M' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
