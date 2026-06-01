@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multi-Quarter Merge Analysis — ATR</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a1929;
+    --bg-card: #0f2236;
+    --bg-card-2: #122a42;
+    --card-border: rgba(255,255,255,0.10);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.62);
+    --cisco-blue: #02C8FF;
+    --accent-magenta: #FF007F;
+    --accent-orange: #FF9000;
+    --status-green: #3DDC84;
+    --status-red: #FF4D4F;
+    --status-yellow: #FFD93D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, #061322 0%, #0a1929 40%, #0a1929 100%);
+    color: var(--text);
+    line-height: 1.45;
+    min-height: 100vh;
+  }
+  header {
+    padding: 36px 48px 24px;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(2,200,255,0.08), transparent);
+  }
+  .eyebrow {
+    color: var(--cisco-blue);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.95rem; font-weight: 800; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 0.95rem; max-width: 920px; }
+  main { padding: 28px 48px 64px; max-width: 1480px; margin: 0 auto; }
+  section { margin-bottom: 36px; }
+  h2 {
+    font-size: 1.05rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--cisco-blue);
+    margin: 0 0 14px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 8px;
+  }
+  .grid { display: grid; gap: 16px; }
+  .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr 1fr; }
+  .three-col { grid-template-columns: 1.2fr 1fr 1fr; }
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .card.kpi { border-top: 3px solid var(--cisco-blue); }
+  .kpi .label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .kpi .value { font-size: 2.1rem; font-weight: 800; margin: 6px 0 2px; letter-spacing: -0.02em; }
+  .kpi .delta { font-size: 0.8rem; color: var(--muted); }
+  .kpi.materiality { border-top-color: var(--accent-orange); }
+  .kpi.materiality .value { color: var(--accent-orange); }
+  .kpi.deals { border-top-color: var(--cisco-blue); }
+  .kpi.deals .value { color: var(--cisco-blue); }
+  .kpi.alert { border-top-color: var(--status-red); }
+  .kpi.alert .value { color: var(--status-red); }
+  .kpi.green { border-top-color: var(--status-green); }
+  .kpi.green .value { color: var(--status-green); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th {
+    text-align: left;
+    color: var(--cisco-blue);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.02);
+  }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  tr:hover td { background: rgba(2,200,255,0.04); }
+  .pct-bar {
+    display: inline-block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--accent-orange);
+    vertical-align: middle;
+    margin-right: 8px;
+    min-width: 2px;
+  }
+  .pct-bar.blue { background: var(--cisco-blue); }
+  .pct-bar.green { background: var(--status-green); }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap.tall { height: 360px; }
+  .banner {
+    background: rgba(255,144,0,0.10);
+    border-left: 4px solid var(--accent-orange);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin-bottom: 22px;
+  }
+  .banner strong { color: var(--accent-orange); }
+  .footnote { color: var(--muted); font-size: 0.78rem; margin-top: 8px; }
+  .pill {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(2,200,255,0.15);
+    color: var(--cisco-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
+  .pill.red { background: rgba(255,77,79,0.15); color: var(--status-red); }
+  .pill.green { background: rgba(61,220,132,0.15); color: var(--status-green); }
+  .pill.orange { background: rgba(255,144,0,0.15); color: var(--accent-orange); }
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Multi-Quarter ATR · Merge Concentration Analysis</div>
+  <h1>How often do deals merge ATR lines from multiple quarters — and where?</h1>
+  <p class="sub">
+    Every row in the source file is an opportunity line. <strong>COUNT_EXP_QTR</strong> is the number of
+    quarters represented on the deal's lines that differ from the deal's booking quarter.
+    <strong>COUNT_EXP_QTR &gt; 1</strong> ⇒ the deal merges ATR from <em>multiple non-booking quarters</em>
+    (a "multi-quarter merge"). Source: <em>MULTI QUARTER ATR.xlsx</em> · 507,126 lines · 407,362 unique deals.
+  </p>
+</header>
+
+<main>
+
+<!-- HEADLINE BANNER -->
+<div class="banner">
+  <strong>Headline:</strong> Multi-quarter merges are <strong>rare in count (2.8% of deals)</strong>
+  but <strong>highly material in dollars — they carry 25.3% of total ATR ($2.93B of $11.59B)</strong>.
+  Concentration is heavily skewed toward <strong>Americas (68% of multi-qtr ATR)</strong>,
+  driven by <strong>US Public Sector, Global Enterprise, and SP segments</strong>.
+</div>
+
+<!-- KPI ROW -->
+<section>
+  <h2>The 30,000-ft picture</h2>
+  <div class="grid kpi-grid">
+    <div class="card kpi deals">
+      <div class="label">Multi-Qtr Merge Deals</div>
+      <div class="value">11,504</div>
+      <div class="delta">of 407,362 total deals · <strong style="color:var(--cisco-blue);">2.82%</strong></div>
+    </div>
+    <div class="card kpi materiality">
+      <div class="label">ATR $ in Multi-Qtr Deals</div>
+      <div class="value">$2.93B</div>
+      <div class="delta">of $11.59B total · <strong style="color:var(--accent-orange);">25.29%</strong> of $ ATR</div>
+    </div>
+    <div class="card kpi alert">
+      <div class="label">$ / Deal Multiplier</div>
+      <div class="value">9.0×</div>
+      <div class="delta">Avg multi-qtr deal ATR vs avg deal ATR — much bigger</div>
+    </div>
+    <div class="card kpi green">
+      <div class="label">Lines Touched</div>
+      <div class="value">17,064</div>
+      <div class="delta">3.36% of all opportunity lines</div>
+    </div>
+  </div>
+  <p class="footnote">
+    The materiality gap (2.8% of deals → 25.3% of $) is the core insight: <em>multi-quarter merges
+    cluster on Cisco's largest opportunities.</em> A small process change here would touch a quarter of total ATR.
+  </p>
+</section>
+
+<!-- DISTRIBUTION + THEATER -->
+<section>
+  <h2>Distribution & theater concentration</h2>
+  <div class="grid two-col">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">Multi-quarter deals by COUNT_EXP_QTR value</h3>
+      <p class="footnote" style="margin:0 0 10px;">Most multi-qtr deals span 2–4 quarters; long tail extends to 24.</p>
+      <div class="chart-wrap"><canvas id="distChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">ATR $ share of multi-qtr merges by Theater</h3>
+      <p class="footnote" style="margin:0 0 10px;">Americas drives ~68% of multi-qtr ATR; also has the highest <em>within-theater</em> share (29.5%).</p>
+      <div class="chart-wrap"><canvas id="theaterChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Theater</th>
+          <th class="num">Total Deals</th>
+          <th class="num">Multi-Qtr Deals</th>
+          <th class="num">Deal %</th>
+          <th class="num">Total ATR</th>
+          <th class="num">Multi-Qtr ATR</th>
+          <th class="num">ATR %</th>
+          <th class="num">% of Multi-Qtr $</th>
+        </tr>
+      </thead>
+      <tbody id="theaterTable"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- WHERE: REGIONS / L3 -->
+<section>
+  <h2>Where the concentration sits — top regions & sales orgs</h2>
+
+  <div class="grid two-col">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">Top 10 Regions (LEVEL_2) by Multi-Qtr ATR $</h3>
+      <p class="footnote" style="margin:0 0 10px;">"Within-region ATR %" shows how multi-qtr-heavy each region is.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th class="num">MQ Deals</th>
+            <th class="num">MQ ATR</th>
+            <th class="num">Within-Region ATR %</th>
+          </tr>
+        </thead>
+        <tbody id="regionTable"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">Top 10 Sales Orgs (LEVEL_3) by Multi-Qtr ATR $</h3>
+      <p class="footnote" style="margin:0 0 10px;">Some sub-orgs run extremely hot — e.g. ASP WEB at <strong style="color:var(--status-red);">76.5%</strong> of its ATR in multi-qtr deals.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Sales Org</th>
+            <th class="num">MQ Deals</th>
+            <th class="num">MQ ATR</th>
+            <th class="num">Within-Org ATR %</th>
+          </tr>
+        </thead>
+        <tbody id="l3Table"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- WHERE: ACCOUNTS / QUARTER -->
+<section>
+  <h2>Account-level concentration & booking quarter</h2>
+  <div class="grid two-col">
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">Top 10 Accounts by Multi-Qtr ATR $</h3>
+      <p class="footnote" style="margin:0 0 10px;">A handful of large accounts run nearly all their ATR through multi-qtr merges.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Account (SAVM Group)</th>
+            <th class="num">MQ Deals</th>
+            <th class="num">MQ ATR</th>
+            <th class="num">% of Acct ATR</th>
+          </tr>
+        </thead>
+        <tbody id="acctTable"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 4px;font-size:0.95rem;">Multi-Qtr ATR $ by Expected Booking Quarter</h3>
+      <p class="footnote" style="margin:0 0 10px;">Materiality grows through the year — Q4 carries the largest multi-qtr ATR.</p>
+      <div class="chart-wrap"><canvas id="quarterChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- TAKEAWAYS -->
+<section>
+  <h2>So what?</h2>
+  <div class="grid three-col">
+    <div class="card" style="border-top:3px solid var(--accent-orange);">
+      <div style="color:var(--accent-orange);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:0.75rem;margin-bottom:6px;">Materiality</div>
+      <p style="margin:0;font-size:0.9rem;">
+        Multi-qtr merges are only <strong>2.8%</strong> of deals but <strong>25.3%</strong> of $ ATR.
+        Average multi-qtr deal is <strong>~9× larger</strong> than the average deal.
+      </p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--cisco-blue);">
+      <div style="color:var(--cisco-blue);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:0.75rem;margin-bottom:6px;">Concentration</div>
+      <p style="margin:0;font-size:0.9rem;">
+        <strong>Americas</strong> owns ~68% of multi-qtr ATR. Inside it, three pockets dominate:
+        <strong>US PS (Federal)</strong>, <strong>Global Enterprise</strong>, and the <strong>SP</strong> segments
+        (Americas SP, APJ SP, EMEA SP) — all running 30–55% of segment ATR through multi-qtr merges.
+      </p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--status-red);">
+      <div style="color:var(--status-red);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;font-size:0.75rem;margin-bottom:6px;">Hot Spots</div>
+      <p style="margin:0;font-size:0.9rem;">
+        <strong>ASP WEB</strong> (76.5%), <strong>APJ_SP_JAPAN</strong> (51%), and <strong>STR_GES PREMIER</strong> (51%)
+        run more than half their ATR through multi-qtr merges. A handful of mega-accounts
+        (Microsoft US, Truist, Apple, Facebook) book &gt;80% of their ATR this way.
+      </p>
+    </div>
+  </div>
+</section>
+
+<p class="footnote" style="text-align:center;margin-top:32px;">
+  Source: <code>MULTI QUARTER ATR.xlsx</code> · 507,126 lines · 407,362 unique DEAL_IDs · ATR sums computed at line level.
+</p>
+
+</main>
+
+<script>
+Chart.defaults.color = 'rgba(255,255,255,0.75)';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+const fmtMoney = v => {
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
+  return '$' + v.toFixed(0);
+};
+const fmtInt = v => v.toLocaleString();
+
+// -------- Distribution chart --------
+const distData = [
+  {q:2,d:7479,a:981079856},{q:3,d:2274,a:562731906},{q:4,d:1216,a:383827395},
+  {q:5,d:627,a:286475600},{q:6,d:326,a:265373176},{q:7,d:194,a:155104604},
+  {q:8,d:97,a:41121332},{q:9,d:79,a:60590033},{q:10,d:65,a:75284472},
+  {q:11,d:36,a:27766112},{q:12,d:30,a:18512736},{q:13,d:11,a:4776340},
+  {q:14,d:13,a:16150201},{q:15,d:5,a:5670054},{q:16,d:7,a:10135615},
+  {q:17,d:7,a:10077776},{q:18,d:3,a:1407944},{q:19,d:4,a:17667978},
+  {q:21,d:2,a:2838878},{q:22,d:1,a:1403029},{q:23,d:1,a:845002},{q:24,d:1,a:2388713}
+];
+new Chart(document.getElementById('distChart'), {
+  type:'bar',
+  data:{
+    labels: distData.map(x=>x.q),
+    datasets:[
+      {label:'Deals', data:distData.map(x=>x.d), backgroundColor:'#02C8FF', yAxisID:'y'},
+      {label:'ATR $', data:distData.map(x=>x.a), backgroundColor:'#FF9000', yAxisID:'y1', type:'line', tension:0.3, borderColor:'#FF9000', pointRadius:3}
+    ]
+  },
+  options:{
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:12}},
+      tooltip:{callbacks:{label:(c)=> c.dataset.label==='ATR $' ? `ATR: ${fmtMoney(c.raw)}` : `Deals: ${fmtInt(c.raw)}`}}
+    },
+    scales:{
+      x:{title:{display:true,text:'COUNT_EXP_QTR (# of non-booking quarters merged)'}},
+      y:{title:{display:true,text:'Deals'},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'ATR $'},grid:{display:false},beginAtZero:true,ticks:{callback:v=>fmtMoney(v)}}
+    }
+  }
+});
+
+// -------- Theater chart --------
+const theaters = [
+  {name:'Americas', total:172386, totATR:6721862362, mqDeals:6332, mqATR:1986106673, dealPct:3.67, atrPct:29.55},
+  {name:'EMEA',     total:145118, totATR:3161094448, mqDeals:2827, mqATR:526924966,  dealPct:1.95, atrPct:16.67},
+  {name:'APJC',     total:89158,  totATR:1693530692, mqDeals:2339, mqATR:418157494,  dealPct:2.62, atrPct:24.69}
+];
+const totMQ = theaters.reduce((s,t)=>s+t.mqATR,0);
+
+new Chart(document.getElementById('theaterChart'), {
+  type:'bar',
+  data:{
+    labels: theaters.map(t=>t.name),
+    datasets:[
+      {label:'Multi-Qtr ATR $', data:theaters.map(t=>t.mqATR), backgroundColor:'#FF9000'},
+      {label:'Rest of ATR $',    data:theaters.map(t=>t.totATR-t.mqATR), backgroundColor:'rgba(2,200,255,0.35)'}
+    ]
+  },
+  options:{
+    indexAxis:'y',
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:12}},
+      tooltip:{callbacks:{label:(c)=> `${c.dataset.label}: ${fmtMoney(c.raw)}`}}
+    },
+    scales:{
+      x:{stacked:true, ticks:{callback:v=>fmtMoney(v)}},
+      y:{stacked:true}
+    }
+  }
+});
+
+// Theater table
+document.getElementById('theaterTable').innerHTML = theaters.map(t=>{
+  const shareOfMQ = (t.mqATR/totMQ)*100;
+  return `<tr>
+    <td><strong>${t.name}</strong></td>
+    <td class="num">${fmtInt(t.total)}</td>
+    <td class="num">${fmtInt(t.mqDeals)}</td>
+    <td class="num">${t.dealPct.toFixed(2)}%</td>
+    <td class="num">${fmtMoney(t.totATR)}</td>
+    <td class="num"><strong style="color:var(--accent-orange);">${fmtMoney(t.mqATR)}</strong></td>
+    <td class="num">${t.atrPct.toFixed(1)}%</td>
+    <td class="num"><span class="pct-bar" style="width:${shareOfMQ*1.2}px;"></span>${shareOfMQ.toFixed(1)}%</td>
+  </tr>`;
+}).join('');
+
+// -------- Regions table (top 10 by MQ ATR) --------
+const regions = [
+  {n:'US PS Market Segment',      d:2115, a:745757781, p:30.98},
+  {n:'GLOBAL ENTERPRISE SEGMENT', d:934,  a:467697356, p:37.09},
+  {n:'AMERICAS_SP',               d:406,  a:359793389, p:44.68},
+  {n:'US COMMERCIAL',             d:2046, a:282598389, p:17.51},
+  {n:'APJ_SP',                    d:224,  a:232899128, p:55.69},
+  {n:'EMEA__SP',                  d:513,  a:181926076, p:32.74},
+  {n:'EMEA__NORTH',               d:567,  a:87177819,  p:15.91},
+  {n:'EMEA__GERMANY',             d:437,  a:80974456,  p:15.33},
+  {n:'EMEA__MEA-TRC',             d:500,  a:75805575,  p:14.76},
+  {n:'LATIN AMERICA',             d:471,  a:65929920,  p:19.11}
+];
+const maxRegionATR = Math.max(...regions.map(r=>r.a));
+document.getElementById('regionTable').innerHTML = regions.map(r=>{
+  const pillCls = r.p>=40?'red':r.p>=25?'orange':'';
+  return `<tr>
+    <td>${r.n}</td>
+    <td class="num">${fmtInt(r.d)}</td>
+    <td class="num"><span class="pct-bar" style="width:${(r.a/maxRegionATR)*90}px;"></span>${fmtMoney(r.a)}</td>
+    <td class="num"><span class="pill ${pillCls}">${r.p.toFixed(1)}%</span></td>
+  </tr>`;
+}).join('');
+
+// -------- LEVEL_3 table --------
+const l3 = [
+  {n:'STR_PS FEDERAL AREA', d:525, a:511303660, p:35.48},
+  {n:'ASP WEB',             d:87,  a:203192460, p:76.52},
+  {n:'ASP TMC',             d:319, a:156600929, p:29.02},
+  {n:'STR_GES EAST',        d:320, a:142459558, p:36.33},
+  {n:'STR_GES PREMIER',     d:145, a:128852453, p:50.95},
+  {n:'SLED-West Area',      d:773, a:127545965, p:26.03},
+  {n:'APJ_SP_JAPAN',        d:102, a:124547054, p:51.09},
+  {n:'COMMERCIAL EAST AREA',d:754, a:119036609, p:22.89},
+  {n:'SLED-East Area',      d:817, a:106908155, p:22.45},
+  {n:'STR_GES WEST',        d:201, a:100915860, p:37.31}
+];
+const maxL3 = Math.max(...l3.map(x=>x.a));
+document.getElementById('l3Table').innerHTML = l3.map(r=>{
+  const pillCls = r.p>=50?'red':r.p>=30?'orange':'';
+  return `<tr>
+    <td>${r.n}</td>
+    <td class="num">${fmtInt(r.d)}</td>
+    <td class="num"><span class="pct-bar" style="width:${(r.a/maxL3)*90}px;"></span>${fmtMoney(r.a)}</td>
+    <td class="num"><span class="pill ${pillCls}">${r.p.toFixed(1)}%</span></td>
+  </tr>`;
+}).join('');
+
+// -------- Accounts --------
+const accts = [
+  {n:'MICROSOFT US',                          d:11,a:73191587,p:93.86},
+  {n:'KDDI',                                  d:33,a:38379729,p:82.27},
+  {n:'TRUIST FINANCIAL CORPORATION CORE US',  d:2, a:37281626,p:98.27},
+  {n:'NTT EAST',                              d:23,a:33905074,p:80.02},
+  {n:'APPLE US',                              d:12,a:30871683,p:82.92},
+  {n:'FACEBOOK US1',                          d:8, a:30662556,p:80.22},
+  {n:'DEPARTMENT OF STATE (DOS) - EXEC DEPT', d:10,a:27921669,p:50.74},
+  {n:'RELIANCE JIO INFOCOM',                  d:4, a:27916886,p:74.13},
+  {n:'FEDERAL BUREAU OF INVESTIGATION (FBI)', d:7, a:27459305,p:69.98},
+  {n:'RAKUTEN MOBILE',                        d:3, a:24389578,p:46.61}
+];
+const maxAcct = Math.max(...accts.map(x=>x.a));
+document.getElementById('acctTable').innerHTML = accts.map(a=>{
+  const pillCls = a.p>=75?'red':a.p>=50?'orange':'green';
+  return `<tr>
+    <td>${a.n}</td>
+    <td class="num">${fmtInt(a.d)}</td>
+    <td class="num"><span class="pct-bar" style="width:${(a.a/maxAcct)*90}px;"></span>${fmtMoney(a.a)}</td>
+    <td class="num"><span class="pill ${pillCls}">${a.p.toFixed(1)}%</span></td>
+  </tr>`;
+}).join('');
+
+// -------- Quarter chart --------
+const qtrs = [
+  {q:'FY26 Q1', d:2654, a:415858458},
+  {q:'FY26 Q2', d:3427, a:827778219},
+  {q:'FY26 Q3', d:2612, a:722450176},
+  {q:'FY26 Q4', d:2811, a:965141898}
+];
+new Chart(document.getElementById('quarterChart'), {
+  type:'bar',
+  data:{
+    labels: qtrs.map(x=>x.q),
+    datasets:[
+      {label:'Multi-Qtr ATR $', data:qtrs.map(x=>x.a), backgroundColor:'#FF9000', yAxisID:'y'},
+      {label:'Multi-Qtr Deals',  data:qtrs.map(x=>x.d), backgroundColor:'#02C8FF', type:'line', borderColor:'#02C8FF', tension:0.3, yAxisID:'y1', pointRadius:4}
+    ]
+  },
+  options:{
+    maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:12}},
+      tooltip:{callbacks:{label:(c)=> c.dataset.label==='Multi-Qtr ATR $' ? `ATR: ${fmtMoney(c.raw)}` : `Deals: ${fmtInt(c.raw)}`}}
+    },
+    scales:{
+      y:{title:{display:true,text:'ATR $'},beginAtZero:true,ticks:{callback:v=>fmtMoney(v)}},
+      y1:{position:'right',title:{display:true,text:'Deals'},grid:{display:false},beginAtZero:true}
+    }
+  }
+});
+</script>
+</body>
+</html>
