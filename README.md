@@ -8,4 +8,5 @@ Leadership analysis decks and readouts.
 - [FY25 vs FY26 YoY Comparison](https://acanteen-git.github.io/Shared-slides/fy25-vs-fy26-yoy-comparison.html)
 - [BATR Migration Options Comparison](https://acanteen-git.github.io/Shared-slides/batr-options-comparison.html)
 - [Multi-Quarter ATR Merge Analysis](https://acanteen-git.github.io/Shared-slides/multi-quarter-merge-analysis.html)
+- [Discounting End State — Renewals Story](https://acanteen-git.github.io/Shared-slides/discounting-end-state.html)
 
