@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Baseline ATR Pilot Tracker — Open Issues</title>
+<style>
+  :root {
+    --bg: #0a1929;
+    --bg-card: #0f2236;
+    --bg-card-2: #122a42;
+    --card-border: rgba(255,255,255,0.10);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.62);
+    --cisco-blue: #02C8FF;
+    --accent-magenta: #FF007F;
+    --accent-orange: #FF9000;
+    --accent-purple: #B36BFF;
+    --status-green: #3DDC84;
+    --status-red: #FF4D4F;
+    --status-yellow: #FFD93D;
+    --status-orange: #FF9000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(180deg, #061322 0%, #0a1929 40%, #0a1929 100%);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 32px 48px 24px;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(2,200,255,0.08), transparent);
+  }
+  .eyebrow {
+    color: var(--cisco-blue);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 0.92rem; }
+
+  /* ── Summary bar ── */
+  .summary-bar {
+    display: flex;
+    gap: 16px;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(2,200,255,0.03);
+    flex-wrap: wrap;
+  }
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    min-width: 140px;
+  }
+  .stat-pill .num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .stat-pill .label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+  }
+  .pill-open   .num { color: var(--status-red); }
+  .pill-wip    .num { color: var(--status-yellow); }
+  .pill-notriage .num { color: var(--status-orange); }
+  .pill-total  .num { color: var(--cisco-blue); }
+
+  /* ── Filters ── */
+  .filter-bar {
+    padding: 16px 48px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .filter-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    letter-spacing: 0.03em;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--cisco-blue);
+    color: var(--cisco-blue);
+    background: rgba(2,200,255,0.08);
+  }
+
+  /* ── Main ── */
+  main { padding: 28px 48px 64px; max-width: 1400px; margin: 0 auto; }
+  section { margin-bottom: 36px; }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+  }
+  .section-header h2 {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--cisco-blue);
+    font-weight: 700;
+  }
+  .section-header .count {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* ── Issue card ── */
+  .issue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: rgba(2,200,255,0.30); }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+  .badge-issue    { background: rgba(255,77,79,0.15);   color: #ff6b6d; border: 1px solid rgba(255,77,79,0.35); }
+  .badge-feedback { background: rgba(179,107,255,0.15); color: #c48aff; border: 1px solid rgba(179,107,255,0.35); }
+  .badge-enhancement { background: rgba(2,200,255,0.12); color: var(--cisco-blue); border: 1px solid rgba(2,200,255,0.30); }
+
+  .status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+  .status-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .s-open   { background: rgba(255,77,79,0.12); color: var(--status-red);    border: 1px solid rgba(255,77,79,0.3); }
+  .s-open::before   { background: var(--status-red); box-shadow: 0 0 4px var(--status-red); }
+  .s-wip    { background: rgba(255,217,61,0.12); color: var(--status-yellow); border: 1px solid rgba(255,217,61,0.3); }
+  .s-wip::before    { background: var(--status-yellow); box-shadow: 0 0 4px var(--status-yellow); }
+  .s-notriage { background: rgba(255,144,0,0.12); color: var(--status-orange); border: 1px solid rgba(255,144,0,0.3); }
+  .s-notriage::before { background: var(--status-orange); box-shadow: 0 0 4px var(--status-orange); }
+
+  .row-num {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .card-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .meta-label {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .meta-value {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.80);
+  }
+  .meta-value.highlight { color: var(--cisco-blue); }
+
+  .detail-box {
+    background: rgba(0,0,0,0.22);
+    border-left: 3px solid rgba(2,200,255,0.30);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.5;
+  }
+
+  .solution-box {
+    background: rgba(61,220,132,0.05);
+    border-left: 3px solid rgba(61,220,132,0.30);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 0.76rem;
+    color: rgba(255,255,255,0.70);
+    line-height: 1.5;
+  }
+  .solution-box strong {
+    color: var(--status-green);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .comments-box {
+    background: rgba(179,107,255,0.05);
+    border-left: 3px solid rgba(179,107,255,0.25);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 0.74rem;
+    color: rgba(255,255,255,0.60);
+    line-height: 1.5;
+  }
+  .comments-box strong {
+    color: #c48aff;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .target-chip {
+    display: inline-block;
+    background: rgba(255,144,0,0.12);
+    color: var(--accent-orange);
+    border: 1px solid rgba(255,144,0,0.3);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .inc-chip {
+    display: inline-block;
+    background: rgba(255,77,79,0.10);
+    color: #ff8a8b;
+    border: 1px solid rgba(255,77,79,0.25);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 8px;
+  }
+
+  .req-chip {
+    display: inline-block;
+    background: rgba(2,200,255,0.12);
+    color: var(--cisco-blue);
+    border: 1px solid rgba(2,200,255,0.30);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Hidden for filter */
+  .card.hidden { display: none; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 0.72rem;
+    border-top: 1px solid var(--card-border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Cisco Renewals · Baseline ATR Pilot</div>
+  <h1>Open Issues &amp; Action Items</h1>
+  <div class="sub">Source: Baseline ATR Pilot Tracker.xlsx — Renewals sheet &nbsp;·&nbsp; As of June 8, 2026</div>
+</header>
+
+<!-- Summary pills -->
+<div class="summary-bar">
+  <div class="stat-pill pill-total">
+    <div class="num">34</div>
+    <div class="label">Total<br>Unresolved</div>
+  </div>
+  <div class="stat-pill pill-open">
+    <div class="num">2</div>
+    <div class="label">Open<br>(no action)</div>
+  </div>
+  <div class="stat-pill pill-wip">
+    <div class="num">29</div>
+    <div class="label">WIP<br>(in progress)</div>
+  </div>
+  <div class="stat-pill pill-notriage">
+    <div class="num">3</div>
+    <div class="label">No Status /<br>Not Triaged</div>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterCards('all', this)">All (34)</button>
+  <button class="filter-btn" onclick="filterCards('open', this)">Open (2)</button>
+  <button class="filter-btn" onclick="filterCards('wip', this)">WIP (29)</button>
+  <button class="filter-btn" onclick="filterCards('notriage', this)">No Status (3)</button>
+  <button class="filter-btn" onclick="filterCards('issue', this)">Issues</button>
+  <button class="filter-btn" onclick="filterCards('feedback', this)">Feedback</button>
+  <button class="filter-btn" onclick="filterCards('enhancement', this)">Enhancements</button>
+</div>
+
+<main>
+
+  <!-- ══ OPEN ══ -->
+  <section>
+    <div class="section-header">
+      <h2>Open</h2>
+      <span class="count">2 items — acknowledged but no active resolution in progress</span>
+    </div>
+    <div class="issue-grid">
+
+      <!-- Row 31 -->
+      <div class="card" data-status="open" data-type="feedback">
+        <div class="card-top">
+          <span class="badge badge-feedback">Feedback</span>
+          <span class="status-dot s-open">Open</span>
+          <span class="row-num">Row 31</span>
+        </div>
+        <div class="card-title">Merged renewal oppty can be reopened after Closed-Cancelled</div>
+        <div class="detail-box">A renewal opportunity that was set to Closed-Cancelled can still be reopened by users. No technical restriction is in place to prevent this.</div>
+        <div class="solution-box">
+          <strong>Proposed Solution</strong>
+          Monitor and evaluate whether to restrict fully Closed-Cancelled renewal opptys from being reopened.
+        </div>
+        <div class="comments-box">
+          <strong>Last Comment</strong>
+          3/20 Maria: No action for now; continue to monitor. Expansion volume tends to be low and adding a restriction could further disrupt user experience.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target Date</span>
+            <span class="target-chip">TBD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 32 -->
+      <div class="card" data-status="open" data-type="feedback">
+        <div class="card-top">
+          <span class="badge badge-feedback">Feedback</span>
+          <span class="status-dot s-open">Open</span>
+          <span class="row-num">Row 32</span>
+        </div>
+        <div class="card-title">BATR opptys for LDOS OLIs created as separate opportunities</div>
+        <div class="detail-box">Baseline ATR opportunities for LDOS (Last Day of Support) OLIs are being created as separate opptys instead of being grouped with others.</div>
+        <div class="solution-box">
+          <strong>Proposed Solution</strong>
+          Update grouping logic to remove criteria based on LDOS.
+        </div>
+        <div class="comments-box">
+          <strong>Last Comment</strong>
+          3/20 Maria: Grouping logic is a broader GA discussion. No action for pilot phase — grouping logic changes would need to support BATR overall even if it means more opportunities.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target Date</span>
+            <span class="target-chip">Q1 FY27</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ WIP ══ -->
+  <section>
+    <div class="section-header">
+      <h2>WIP — System &amp; Data Issues</h2>
+      <span class="count">Active investigation or pending fix</span>
+    </div>
+    <div class="issue-grid">
+
+      <!-- Row 2 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 2</span>
+        </div>
+        <div class="card-title">Multiple users unable to close deals — read-only access</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Users</span>
+            <span class="meta-value">Mikaela Grove · Brandon Wright</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 6, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">
+          Sub-issues 1 &amp; 2 unresolved:<br>
+          1) Mikaela: Unable to close deals 73327098 / 73326869 — Maria followed up 3/13, no closure<br>
+          2) Brandon: Can't close DID 73327151 — "in process of moving opptys to Stage 0" but no confirmation
+        </div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          Sub-issue 3 (Jon Ruth) is COMPLETED/CLOSED. Sub-issues 1 and 2 remain WIP with no response to user's 3/13 follow-up.
+        </div>
+      </div>
+
+      <!-- Row 33 -->
+      <div class="card" data-status="wip" data-type="enhancement">
+        <div class="card-top">
+          <span class="badge badge-enhancement">Enhancement</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="req-chip">GA Blocker</span>
+          <span class="row-num">Row 33</span>
+        </div>
+        <div class="card-title">BATR opptys created for already-Closed Legacy ATR opptys</div>
+        <div class="detail-box">When a Legacy ATR opportunity is already closed, the system still creates a corresponding BATR opportunity, requiring manual cleanup.</div>
+        <div class="solution-box">
+          <strong>Proposed Solution</strong>
+          In a 1:1 scenario, automatically set BATR oppty to Closed. For others, identify renewed assets and close applicable BATR opptys accordingly.
+        </div>
+        <div class="comments-box">
+          <strong>Last Comment</strong>
+          3/20 Maria: For all offers, all valid BATR was loaded — even if legacy was closed Won/Lost. A broader fix is needed before GA.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target Date</span>
+            <span class="target-chip">TBD</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 34 -->
+      <div class="card" data-status="wip" data-type="enhancement">
+        <div class="card-top">
+          <span class="badge badge-enhancement">Enhancement</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="req-chip">Hard GA Requirement</span>
+          <span class="row-num">Row 34</span>
+        </div>
+        <div class="card-title">BATR references require backend team lookup — no SFDC visibility</div>
+        <div class="detail-box">Currently, looking up BATR references requires involvement from backend/EDF teams. Users and the support team cannot self-serve this in Salesforce.</div>
+        <div class="solution-box">
+          <strong>No Solution Defined Yet</strong>
+          EDF is aware this is not sustainable at GA scale.
+        </div>
+        <div class="comments-box">
+          <strong>Last Comment</strong>
+          3/20 Maria: This is a hard requirement for GA. Ties to the closed-loop process needed for Row 2. EDF must implement SFDC visibility before broad rollout.
+        </div>
+      </div>
+
+      <!-- Row 37 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 37</span>
+        </div>
+        <div class="card-title">Q2 Closed-Won deals read-only with no BATR oppty created</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Tu Kieu</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 12, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Deals from Q2 that recently Closed-Won are read-only but no BATR oppty was created. Stage needs to be updated to Closed Won.</div>
+        <div class="comments-box">
+          <strong>Last Update (Mar 17)</strong>
+          Ashok: Data fixed manually. Opptys got loaded due to BATR eligibility. No closed-loop process is yet established — root cause not fully resolved.
+        </div>
+      </div>
+
+      <!-- Row 40 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 40</span>
+        </div>
+        <div class="card-title">Assets due Q1FY28 showing in Q4FY26 BATR list — wrong quarter assignment</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Abhijit DuttaChoudhuri</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">DID</span>
+            <span class="meta-value highlight">73282380</span>
+          </div>
+        </div>
+        <div class="detail-box">95% of assets on DID 73282380 are due for renewal in Q1FY28, but the oppty is appearing in the Q4FY26 BATR list. System unable to identify 'Signed' assets correctly.</div>
+        <div class="comments-box">
+          <strong>Last Update (Mar 17)</strong>
+          Seller is looking for asset splitting from IB Asset Linkage. Ashok looped in Foundation Team for insights — no resolution yet.
+        </div>
+      </div>
+
+      <!-- Row 41 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 41</span>
+        </div>
+        <div class="card-title">Prior SW QTY amounts not displaying in BATR opptys</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Tu Kieu</span>
+          </div>
+        </div>
+        <div class="detail-box">In new BATR opptys, the "Prior SW" section does not show QTY amounts, whereas it did in the legacy ATR view.</div>
+        <div class="comments-box">
+          <strong>Last Update (Mar 17)</strong>
+          Ashok: Tracking for April release.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target</span>
+            <span class="target-chip">April Release</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 47 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 47</span>
+        </div>
+        <div class="card-title">DID 73326869 stuck in wrong stage — should be Stage 0</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mikaela Grove</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 26, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">DID 73326869 should be in Stage 0. EDF issue: oppty was created with incorrect BATR flag for a pilot territory.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          EDF team is fixing. Multiple follow-ups from user with no final confirmation. Maria was out; Ashok was looped in and said he'd share details — no closure recorded.
+        </div>
+      </div>
+
+      <!-- Row 49 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 49</span>
+        </div>
+        <div class="card-title">Two RNW opptys never merged into BATR oppty</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Saul Vega</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">DIDs</span>
+            <span class="meta-value highlight">72567296 · 72621869</span>
+          </div>
+        </div>
+        <div class="detail-box">Two RNW opptys that should have merged into a single BATR oppty never did. Production incident raised.</div>
+        <div class="solution-box">
+          <strong>Incident</strong>
+          <span class="inc-chip">INC10719812</span> — No follow-up update recorded.
+        </div>
+      </div>
+
+      <!-- Row 51 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 51</span>
+        </div>
+        <div class="card-title">Unable to access Asset View for BATR oppty — DID 73261591</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Marta Dudek</span>
+          </div>
+        </div>
+        <div class="detail-box">No Asset View access on BATR oppty DID 73261591, and no reference to the related legacy oppty.</div>
+        <div class="solution-box">
+          <strong>Incident</strong>
+          <span class="inc-chip">INC10724052</span> — EDF issue.
+        </div>
+        <div class="comments-box">
+          <strong>Last Update (Mar 17)</strong>
+          Ashok: Incident still open.
+        </div>
+      </div>
+
+      <!-- Row 52 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 52</span>
+        </div>
+        <div class="card-title">APJC RM has no BATR oppty for legacy ATR 71207031</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Unknown APJC RM</span>
+          </div>
+        </div>
+        <div class="detail-box">RM in APJC has legacy ATR oppty 71207031 but no corresponding BATR oppty can be located. RM identity is also unclear.</div>
+        <div class="solution-box">
+          <strong>Incident</strong>
+          <span class="inc-chip">INC10724067</span>
+        </div>
+        <div class="comments-box">
+          <strong>Last Comment</strong>
+          Marirosa posted in Teams space — RM identity still not confirmed.
+        </div>
+      </div>
+
+      <!-- Row 58 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 58</span>
+        </div>
+        <div class="card-title">Dollar value incorrect after quote reconcile/integration — connection failure error</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mikaela Grove</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Quote</span>
+            <span class="meta-value highlight">252281281</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 13, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Attaching, reconciling, and integrating quote 252281281 results in "Connection failure. Please resubmit your request for quote integration" and an incorrect dollar value.</div>
+        <div class="solution-box">
+          <strong>Status</strong>
+          Technical glitch — Engineering team investigating. No resolution yet.
+        </div>
+      </div>
+
+      <!-- Row 59 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 59</span>
+        </div>
+        <div class="card-title">BATR oppty not displaying assets — confirmed code fix needed</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Raised By</span>
+            <span class="meta-value">Maria</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 17, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">BATR opptys not displaying assets. EDF confirmed root cause requires a code fix.</div>
+        <div class="solution-box">
+          <strong>Target</strong>
+          Will be part of April release. Communicated in Webex space and comms email.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target</span>
+            <span class="target-chip">April Release</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WIP — UX / Functional -->
+  <section>
+    <div class="section-header">
+      <h2>WIP — User Experience &amp; Functional Gaps</h2>
+      <span class="count">Gaps in product behavior, visibility, or user workflow</span>
+    </div>
+    <div class="issue-grid">
+
+      <!-- Row 35 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 35</span>
+        </div>
+        <div class="card-title">RSs not being added to BATR oppty team</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Curtis Marshall</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 9, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Renewal Specialists (RSs) are not being automatically added to the opportunity team on BATR opptys.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/23 Maria: DM'd Curtis for an example. BATR should follow same assignment logic as ATR — no issue expected. Maria said she'd check on it. No follow-up recorded.
+        </div>
+      </div>
+
+      <!-- Row 36 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 36</span>
+        </div>
+        <div class="card-title">Cases opened during ATR validation still being considered in BATR</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Abhijit DuttaChoudhuri</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 11, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">User opened cases while doing ATR validation and was assured those ATRs wouldn't be factored in — but they are still being considered.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          Ashok replied that he would check on it. No resolution recorded.
+        </div>
+      </div>
+
+      <!-- Row 38 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 38</span>
+        </div>
+        <div class="card-title">Product Bill To not viewable in BATR — impacts distributor account managers</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mikaela Grove</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 13, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Users managing distributor accounts cannot view "Product Bill To" in BATR opptys. This was a field visible in legacy ATR.</div>
+        <div class="solution-box">
+          <strong>Promised Enhancement</strong>
+          Team stated this would be added as an enhancement. No details or target provided.
+        </div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/19 Marirosa: Posted in Teams, tagged user, tagged Maria for visibility. No response since 3/11.
+        </div>
+      </div>
+
+      <!-- Row 39 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 39</span>
+        </div>
+        <div class="card-title">CXEA proposal copy functionality broken for BATR deals</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Nobuhide Fumimoto</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 17, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">CXEA proposal copy functionality isn't working properly for BATR deals, forcing users to fall back to Legacy DIDs and increasing time to build new proposals.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/19 Marirosa: Tagged in Teams for more info — needs to confirm whether copying a CXEA to a BATR is failing. Maria tagged for visibility. No resolution recorded.
+        </div>
+      </div>
+
+      <!-- Row 42 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 42</span>
+        </div>
+        <div class="card-title">Forecast committed dollars vanish when BATR deal merged into expansion oppty</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mike Corona</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 24, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Forecasting BATR deals that are merged/cancelled and moved to an expansion oppty causes committed dollars to disappear from the forecast view.</div>
+        <div class="solution-box">
+          <strong>In Progress</strong>
+          Working on reporting options to maintain visibility and renewal forecast methodology.
+        </div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          Ammar told user the team would keep him posted. No reporting solution delivered yet.
+        </div>
+      </div>
+
+      <!-- Row 43 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 43</span>
+        </div>
+        <div class="card-title">Reconcile/integrate restored but user never notified</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mikaela Grove</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 24, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Capability to reconcile and integrate assets/quotes was restored in the March release, but the user who raised the issue was never informed.</div>
+        <div class="comments-box">
+          <strong>Action Needed</strong>
+          Close out the loop with the user — confirm functionality is restored and usable.
+        </div>
+      </div>
+
+      <!-- Row 44 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 44</span>
+        </div>
+        <div class="card-title">Many BATR opptys missing Prior SW data — field is blank</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Ashton Dunn</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Feb 25, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">A large number of BATR opptys have no Prior SW listed — the field is blank where it should contain data.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/19 Marirosa: Posted in Teams and tagged user to provide sample DID for investigation. Maria tagged for visibility. No sample received / no resolution yet.
+        </div>
+      </div>
+
+      <!-- Row 46 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 46</span>
+        </div>
+        <div class="card-title">DID 73278101 — no Prior SW, DNA renewals in wrong quarter</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Abhijit DuttaChoudhuri</span>
+          </div>
+        </div>
+        <div class="detail-box">DID 73278101 (Q3FY26): no prior SW details, prior SO# references DNA renewals due in Q3FY28, and prior service contracts have no active DNA lines.</div>
+        <div class="solution-box">
+          <strong>In Progress</strong>
+          Maria to investigate. On-demand sync attempted — did not resolve the issue.
+        </div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/23 Maria: Reached out to user and IT. Sync attempted and failed.
+        </div>
+      </div>
+
+      <!-- Row 48 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 48</span>
+        </div>
+        <div class="card-title">CXAIA AI prompts not working in BATR deals</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mike Corona</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">DID</span>
+            <span class="meta-value highlight">73276649</span>
+          </div>
+        </div>
+        <div class="detail-box">CXAIA isn't providing expected functionality in BATR deals — e.g., "summarize the renewal risk determinants" prompt works on ATR deals but not on BATR deals.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          Greg said he'd make the team aware. No follow-up since then.
+        </div>
+      </div>
+
+      <!-- Row 50 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 50</span>
+        </div>
+        <div class="card-title">Closed Won value duplicated across legacy ATR and BATR opptys</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Aya Sawane</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Legacy DID</span>
+            <span class="meta-value highlight">72182863</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">BATR DID</span>
+            <span class="meta-value highlight">73262532</span>
+          </div>
+        </div>
+        <div class="detail-box">Closed Won value is duplicated — legacy ATR DID 72182863 value should be set to 0 to avoid double-counting.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/23 Maria: Reached out to user for additional details. Pending response.
+        </div>
+      </div>
+
+      <!-- Row 53 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 53</span>
+        </div>
+        <div class="card-title">Wireless oppty incorrectly appearing in security report</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Choni Yangzom</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 4, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">A wireless opportunity is incorrectly showing up in a report that was supposed to pull only security-related opptys.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          3/23 Maria: DM'd user for DID, pending response. User included screenshots. 3/19 Marirosa: Tagged Maria to clarify which report is referenced.
+        </div>
+      </div>
+
+      <!-- Row 54 -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 54</span>
+        </div>
+        <div class="card-title">SW oppty unexpectedly lost &amp; Asset View missing after merge to expansion</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Mikaela Grove</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">DIDs</span>
+            <span class="meta-value highlight">73162092 · 73254787</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 9, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">After merging a SW oppty into a parent expansion oppty, the deal became unexpectedly lost and Asset View disappeared. Asset View was eventually found on a different oppty (73254787) but reconciliation status isn't visible.</div>
+        <div class="comments-box">
+          <strong>Last Update</strong>
+          Maria replied she was checking on it. No resolution recorded.
+        </div>
+      </div>
+
+      <!-- Row 55 -->
+      <div class="card" data-status="wip" data-type="feedback">
+        <div class="card-top">
+          <span class="badge badge-feedback">Feedback</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 55</span>
+        </div>
+        <div class="card-title">Renewal sellers hesitant to merge expansion opptys — lack of NGF visibility</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Users</span>
+            <span class="meta-value">Ryan Lundberg &amp; others</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 11, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Multiple renewal sellers are hesitant to merge expansion opptys because they lose visibility in the NGF (Next Generation Forecasting) tool after the merge.</div>
+        <div class="comments-box">
+          <strong>No Action Recorded</strong>
+          No solution or owner assigned.
+        </div>
+      </div>
+
+      <!-- Row 56 -->
+      <div class="card" data-status="wip" data-type="feedback">
+        <div class="card-top">
+          <span class="badge badge-feedback">Feedback</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 56</span>
+        </div>
+        <div class="card-title">RCH / RCH4L dashboard gaps — especially for multi-architecture deals</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Curtis Marshall</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 11, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Lack of visibility in RCH and RCH4L dashboards, particularly for deals spanning multiple architectures.</div>
+        <div class="comments-box">
+          <strong>No Action Recorded</strong>
+          No solution or owner assigned.
+        </div>
+      </div>
+
+      <!-- Row 57 -->
+      <div class="card" data-status="wip" data-type="enhancement">
+        <div class="card-top">
+          <span class="badge badge-enhancement">Enhancement</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 57</span>
+        </div>
+        <div class="card-title">Webex Teams notifications requested for deal updates</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Nicole Courtemache</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 11, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Enhancement request: send Webex Teams space notifications when a deal is updated (e.g., "the quote has been updated").</div>
+        <div class="comments-box">
+          <strong>No Action Recorded</strong>
+          No solution or owner assigned.
+        </div>
+      </div>
+
+      <!-- Row 30 sub-issue -->
+      <div class="card" data-status="wip" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-wip">WIP</span>
+          <span class="row-num">Row 30</span>
+        </div>
+        <div class="card-title">CCWR quote attachment still failing for Todd Jones</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">User</span>
+            <span class="meta-value">Todd Jones</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 5, 2026</span>
+          </div>
+        </div>
+        <div class="detail-box">Sub-issue 2: Todd Jones unable to attach a CCWR quote to a BATR DID. Quote is not yet published to Salesmain for visibility. Sub-issue 1 (Ryan Lundberg) was resolved.</div>
+        <div class="solution-box">
+          <strong>In Progress</strong>
+          Checking with CCWR team on publication status. No confirmation of resolution.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ NOT TRIAGED ══ -->
+  <section>
+    <div class="section-header">
+      <h2>No Status / Not Triaged</h2>
+      <span class="count">3 items — no owner, no status, no response recorded</span>
+    </div>
+    <div class="issue-grid">
+
+      <!-- Row 60 -->
+      <div class="card" data-status="notriage" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-notriage">No Status</span>
+          <span class="row-num">Row 60</span>
+        </div>
+        <div class="card-title">Renewal Risk model not available on BATR opptys</div>
+        <div class="detail-box">Renewal Risk is not available on Baseline ATR opportunities — feature parity gap vs. legacy ATR view.</div>
+        <div class="solution-box">
+          <strong>Proposed Solution</strong>
+          Update Risk Model to leverage the Baseline ATR view.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Target Date</span>
+            <span class="target-chip">TBD</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Owner</span>
+            <span class="meta-value" style="color: var(--status-red);">None assigned</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 61 -->
+      <div class="card" data-status="notriage" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-notriage">No Status</span>
+          <span class="row-num">Row 61</span>
+        </div>
+        <div class="card-title">MEDDPIC and Deal Pulse not available on BATR opptys</div>
+        <div class="detail-box">MEDDPIC framework fields and Deal Pulse are not available on BATR opportunities — both are key tools used by sellers in legacy ATR.</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Solution</span>
+            <span class="meta-value" style="color: var(--status-red);">None defined</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Owner</span>
+            <span class="meta-value" style="color: var(--status-red);">None assigned</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 62 -->
+      <div class="card" data-status="notriage" data-type="issue">
+        <div class="card-top">
+          <span class="badge badge-issue">Issue</span>
+          <span class="status-dot s-notriage">No Status</span>
+          <span class="row-num">Row 62</span>
+        </div>
+        <div class="card-title">Two issues raised by James Drees — no POC or response</div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Raised By</span>
+            <span class="meta-value">James Drees (on behalf of RM)</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">Mar 17, 2026</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">POC</span>
+            <span class="meta-value highlight">Ricardo</span>
+          </div>
+        </div>
+        <div class="detail-box">
+          <strong style="display:block; margin-bottom:4px; font-size:0.72rem; color: var(--cisco-blue);">Issue 1 — DID 81497119 (Advics/Toyota)</strong>
+          User is prompted to merge a closed-cancelled renewal opportunity. Banner shows "Please do not re-open." — confusing UX with no clear action path.<br><br>
+          <strong style="display:block; margin-bottom:4px; margin-top:8px; font-size:0.72rem; color: var(--cisco-blue);">Issue 2 — DID 73270354 (Honda MFG of America)</strong>
+          Close date end of March, Stage 1. Multiple ATR RNW opptys visible to user — should these be Stage 0-Target and excluded from expansion motion? No guidance provided.
+        </div>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Response</span>
+            <span class="meta-value" style="color: var(--status-red);">None recorded</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Baseline ATR Pilot Tracker · Renewals Sheet · 62 rows · 34 unresolved of 61 tracked &nbsp;·&nbsp; Generated June 8, 2026
+</footer>
+
+<script>
+  function filterCards(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.card').forEach(card => {
+      if (type === 'all') {
+        card.classList.remove('hidden');
+      } else if (['open','wip','notriage'].includes(type)) {
+        card.classList.toggle('hidden', card.dataset.status !== type);
+      } else {
+        card.classList.toggle('hidden', card.dataset.type !== type);
+      }
+    });
+  }
+</script>
+</body>
+</html>
