@@ -1072,6 +1072,42 @@ html,body {
 .barrier-grid {
   display:grid; grid-template-columns:1fr 1fr; gap:12px; flex:1;
 }
+
+/* Epic table (Slide 3 — Committed deliverables, from transactability-scope-readout §5) */
+.epic-grid {
+  display:grid;
+  grid-template-columns: 1.1fr 1.8fr 1.5fr 1.3fr;
+  gap:0;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:6px;
+  overflow:hidden;
+}
+.epic-grid .egh, .epic-grid .egc {
+  padding:10px 14px; font-size:0.82rem; line-height:1.45;
+  border-bottom:1px solid var(--card-border);
+}
+.epic-grid .egh {
+  background:rgba(255,255,255,0.04);
+  color:var(--cisco-blue); font-weight:700; font-size:0.7rem;
+  letter-spacing:0.06em; text-transform:uppercase;
+}
+.epic-grid .egc { color:var(--text-secondary); }
+.epic-grid .egc strong { color:var(--text-primary); font-weight:700; }
+.epic-grid .egc.status-delivered { color:var(--status-green); font-weight:700; }
+.epic-grid .egc.status-progress  { color:var(--cisco-blue); font-weight:700; }
+.epic-grid .egc.status-planned   { color:var(--accent-orange); font-weight:700; }
+.epic-grid > div:nth-last-child(-n+4) { border-bottom:none; }
+
+.footnote-pill {
+  margin-top:12px;
+  display:inline-block;
+  padding:6px 12px; border-radius:20px;
+  background:rgba(255,144,0,0.10);
+  border:1px solid rgba(255,144,0,0.35);
+  color:var(--accent-orange);
+  font-size:0.75rem; font-weight:700;
+}
 .barrier-card {
   background:var(--card-bg); border:1px solid var(--card-border);
   border-radius:6px; padding:16px 18px;
@@ -1373,6 +1409,110 @@ html,body {
 }
 .barrier-card .b-blocks strong { color:var(--accent-orange); }
 .barrier-card.critical .b-blocks strong { color:var(--accent-magenta); }
+
+/* Release timeline (Slide 3) */
+.release-timeline {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+  margin-top:14px;
+  position:relative;
+  padding-top:22px;
+}
+.release-timeline::before {
+  content:"";
+  position:absolute;
+  top:8px; left:12px; right:12px;
+  height:2px;
+  background:linear-gradient(90deg, var(--status-green), var(--cisco-blue), var(--medium-blue), var(--accent-orange));
+  border-radius:2px;
+}
+.release-card {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:8px;
+  padding:14px 16px 12px;
+  position:relative;
+  border-top:3px solid var(--cisco-blue);
+  display:flex; flex-direction:column;
+}
+.release-card::before {
+  content:"";
+  position:absolute;
+  top:-19px; left:50%;
+  width:14px; height:14px;
+  background:var(--cisco-blue);
+  border:3px solid var(--bg);
+  border-radius:50%;
+  transform:translateX(-50%);
+  box-shadow:0 0 0 2px var(--cisco-blue);
+}
+.release-card.tbd {
+  border-top-color:var(--accent-orange);
+  background:rgba(255,144,0,0.05);
+}
+.release-card.tbd::before {
+  background:var(--accent-orange);
+  box-shadow:0 0 0 2px var(--accent-orange);
+}
+.rc-date-pill {
+  display:inline-block; align-self:flex-start;
+  padding:4px 10px; border-radius:12px;
+  background:rgba(2,200,255,0.15);
+  color:var(--cisco-blue);
+  font-size:0.78rem; font-weight:800;
+  letter-spacing:0.05em;
+  margin-bottom:6px;
+}
+.rc-date-pill.tbd {
+  background:rgba(255,144,0,0.15);
+  color:var(--accent-orange);
+}
+.rc-channel {
+  font-size:0.72rem; font-weight:700;
+  color:var(--text-primary);
+  margin-bottom:8px;
+  letter-spacing:0.02em;
+}
+.rc-items { padding-left:0; list-style:none; margin:0; }
+.rc-items li {
+  font-size:0.75rem; line-height:1.5;
+  color:var(--text-secondary);
+  padding-left:12px; position:relative;
+  margin-bottom:5px;
+}
+.rc-items li::before {
+  content:"A";
+  position:absolute; left:0;
+  color:var(--cisco-blue); font-weight:700;
+}
+.rc-items li strong { color:var(--text-primary); font-weight:700; }
+.rc-tbd-body {
+  font-size:0.78rem; line-height:1.5;
+  color:var(--text-secondary);
+  font-style:italic;
+}
+
+/* Cadence info strip */
+.cadence-strip {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+  margin-top:14px;
+}
+.cs-item {
+  background:rgba(2,200,255,0.06);
+  border:1px solid rgba(2,200,255,0.30);
+  border-radius:6px;
+  padding:10px 14px;
+}
+.cs-label {
+  font-size:0.65rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  color:var(--cisco-blue);
+  margin-bottom:4px;
+}
+.cs-body {
+  font-size:0.8rem; line-height:1.45;
+  color:var(--text-secondary);
+}
+.cs-body strong { color:var(--text-primary); font-weight:700; }
 </style>
 </head>
 <body>
@@ -1596,14 +1736,14 @@ html,body {
           <span class="chip status-live-link">Open Member Deck &rarr;</span>
         </div>
       </div>
-      <div class="big-tile mem clickable" data-goto="20" role="button" tabindex="0">
+      <div class="big-tile mem clickable" data-goto="21" role="button" tabindex="0">
         <div class="bt-eyebrow">Marirosa · Drives Defend + Scale</div>
         <div class="bt-title">CRM/Core Tools · Release Readiness</div>
         <div class="bt-line">Systems sellers actually work in &mdash; accurate, connected, usable · every release lands cleanly.</div>        <div class="bt-meta">
           <span class="chip status-live-link">Open Member Deck &rarr;</span>
         </div>
       </div>
-      <div class="big-tile mem clickable" data-goto="18" role="button" tabindex="0">
+      <div class="big-tile mem clickable" data-goto="19" role="button" tabindex="0">
         <div class="bt-eyebrow">Ammar · Drives Scale + Automation &amp; Efficiency</div>
         <div class="bt-title">Seller Processes · Automation &amp; Scalability</div>
         <div class="bt-line">End-to-end flow simplified · building efficiency in the volume business.</div>        <div class="bt-meta">
@@ -2173,24 +2313,20 @@ html,body {
     <div class="gradient-bar primary"></div>
     <div class="slide-eyebrow">Cynthia · Transactability &amp; Policy · What we're working on &amp; why</div>
     <div class="slide-title">Making Cisco easier to transact with.</div>
-    <div class="slide-subtitle">Clean opps + clean rules. Both feed the same outcome &mdash; deals close on strategy without transactability defects.</div>
+    <div class="slide-subtitle">Seven workstreams intercepting different failure modes in quote-to-order with varied stakeholders.</div>
 
     <div class="dual-focus">
       <div class="df-card trans">
         <div class="df-eyebrow">Focus Area 1 · Transactability</div>
-        <div class="df-headline">Every renewal is only as good as our ability to transact it.</div>
-        <div class="df-sub">Seven workstreams intercept different failure modes in quote-to-order &mdash; three biggest are in flight now.</div>
-
-        <div class="df-metrics">
-          <div class="df-metric g"><div class="v">Partial</div><div class="l">Delivered in FY26</div></div>
-          <div class="df-metric o"><div class="v">FY27</div><div class="l">Planned releases</div></div>
-        </div>
+        <div class="df-headline">The transaction surface &mdash; data, offer design, commerce, and incentives.</div>
+        <div class="df-sub">Four workstreams that shape the system where every renewal executes.</div>
 
         <div class="df-section-label">Live workstreams</div>
         <ul class="df-list">
-          <li><strong>Discover More Renewals</strong> &mdash; help partners find what to renew. <em>Planned FY27 release.</em></li>
-          <li><strong>Late-renewal revenue gap</strong> &mdash; close the gap on renewals that fall outside standard timing. <em>Partially delivered; additional FY27 releases planned.</em></li>
-          <li><strong>Pricing &amp; discounting gap</strong> &mdash; close the biggest transactability blockers driven by pricing and discount rules. <em>Partially delivered; additional FY27 releases planned.</em></li>
+          <li><strong>Discover more renewals</strong> &mdash; help partners find what to renew. <em>Planned FY27 release.</em></li>
+          <li><strong>Renewal input on new offers</strong> &mdash; bring renewal transactability into new and redesigned offers <em>before they lock</em>. Ongoing across active offer-design engagements.</li>
+          <li><strong>Large-scale commerce changes</strong> &mdash; Services EOL enforcement, non-standard flow, CCWR multi-line edit, EOL milestones for SaaS/TnC/TnC+.</li>
+          <li><strong>Incentive design</strong> &mdash; supporting the incentive team on renewals-aware designs.</li>
         </ul>
 
         <div class="df-section-label">Shift-left · 8 offer-design engagements</div>
@@ -2207,22 +2343,15 @@ html,body {
       </div>
 
       <div class="df-card policy">
-        <div class="df-eyebrow">Focus Area 2 · Policy + Structural</div>
-        <div class="df-headline">The rules &mdash; and the structural rewrites &mdash; behind every clean renewal.</div>
-        <div class="df-sub">Two live policy items. Seven commerce structural changes. <strong>Small list, wide ripple.</strong></div>
+        <div class="df-eyebrow">Focus Area 2 · Policy</div>
+        <div class="df-headline">The rules &mdash; and where the rules cause revenue to slip.</div>
+        <div class="df-sub">Policy changes plus the revenue-gap workstreams that flow directly from policy-driven timing and pricing.</div>
 
-        <div class="df-section-label">Policy · Rules of engagement</div>
+        <div class="df-section-label">Live workstreams</div>
         <ul class="df-list">
-          <li><strong>Downsell in GRP</strong> &mdash; treatment and guardrails within the Global Renewal Policy.</li>
-          <li><strong>True-forward treatment</strong> &mdash; carry mid-term additions into renewal without breaking the reference.</li>
-        </ul>
-
-        <div class="df-section-label">Commerce · Structural changes in flight</div>
-        <ul class="df-list">
-          <li>Services <strong>EOL enforcement</strong> + minimizing renewal impact.</li>
-          <li><strong>EC &rarr; Signature</strong> · <strong>Solution Support &rarr; Standard</strong> migrations.</li>
-          <li>Collapse of service offers to three: <strong>Basic, Standard, Signature</strong>.</li>
-          <li>Non-standard flow · <strong>CCWR</strong> multi-line edit · EOL enforcement for <strong>SaaS, TnC, TnC+</strong>.</li>
+          <li><strong>Policy changes</strong> &mdash; Downsell in GRP; True-forward treatment. <em>Small list, wide ripple.</em></li>
+          <li><strong>Late renewals</strong> &mdash; close the gap on renewals that fall outside standard timing. <em>Partially delivered; additional FY27 releases planned.</em></li>
+          <li><strong>Pricing &amp; discounting</strong> &mdash; close the biggest transactability blockers driven by pricing and discount rules. <em>Partially delivered; additional FY27 releases planned.</em></li>
         </ul>
       </div>
     </div>
@@ -2240,7 +2369,7 @@ html,body {
       </div>
     </div>
   </div>
-  <div class="notes-panel">Condensed What/Why slide (per user direction). Both focus areas on one slide with punchy headlines and momentum metrics. Left column = Transactability with 3 workstream bullets + 8-engagement shift-left chip strip. Right column = Policy + Structural with policy items and commerce structural changes. Input Channels footer acts as the citation strip so we don't have to justify each workstream individually (framework §3). Off-paper takeaway: 'there is a lot here, and I can navigate the basics.'</div>
+  <div class="notes-panel">Cynthia's What/Why slide (v3). Slide 1 uses the seven-workstream portfolio from slide 4 of transactability-scope-readout.html, split per user direction. Transactability card (left, green) holds four workstreams that shape the transaction system itself: discover more renewals (data / partner discovery), renewal input on new offers (shift-left), large-scale commerce changes (structural rewrites), incentive design (support to the incentive team). Policy card (right, magenta) holds the three workstreams flowing directly from policy-driven timing and pricing: policy changes (GRP downsell + True-forward), late renewals, pricing & discounting. Momentum metrics live on the policy side because that's where the 'partially delivered / FY27 planned' story is concentrated. No epic numbers on Slide 1 per prior user direction. Slide 2 is unchanged from v2.</div>
 </div>
 <div class="slide member cynthia">
   <div class="slide-inner">
@@ -2284,6 +2413,51 @@ html,body {
     </div>
   </div>
   <div class="notes-panel">Cynthia's 'what we're working through' slide (framework §2, Q2). Language is deliberately owned and proactive — every theme is framed as something the team is actively steering, not waiting on. Theme 1 (RevAcct) still carries the magenta border to indicate its size, but the tag reads 'In progress' rather than 'Immediate' so leadership hears momentum, not escalation. 'In flight across' replaces 'Blocks' so leadership sees the resolution surface, not a blocker list. No explicit ask — the themes are shared for awareness, not for help.</div>
+</div>
+<div class="slide member cynthia">
+  <div class="slide-inner">
+    <a class="back-to-scopes" data-goto="4" role="button" tabindex="0">&larr; Back to Team Member Scopes</a>
+    <div class="cisco-logo logo-content"><svg viewBox="0 0 235.59 124.17" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" overflow="hidden"><g><g><g><rect x="66.63" y="82.51" width="10.33" height="40.94" fill="#FFFFFF"/><path d="M160.26 94.24C157.594 92.7891 154.605 92.0357 151.57 92.05 144.89 92.05 140.26 96.7 140.26 102.97 140.26 109.05 144.69 113.9 151.57 113.9 154.601 113.904 157.586 113.158 160.26 111.73L160.26 122.73C157.208 123.673 154.034 124.164 150.84 124.19 139.22 124.19 129.03 116.19 129.03 102.99 129.03 90.77 138.25 81.8 150.84 81.8 154.036 81.8088 157.213 82.3044 160.26 83.27Z" fill="#FFFFFF"/><path d="M52.43 94.24C49.7693 92.7854 46.7823 92.0317 43.75 92.05 37.06 92.05 32.43 96.7 32.43 102.97 32.43 109.05 36.87 113.9 43.75 113.9 46.7789 113.911 49.7625 113.165 52.43 111.73L52.43 122.73C49.3745 123.671 46.197 124.156 43 124.17 31.39 124.17 21.2 116.17 21.2 102.97 21.2 90.75 30.43 81.78 43 81.78 46.1966 81.7866 49.3734 82.2823 52.42 83.25Z" fill="#FFFFFF"/><path d="M214.39 103C214.39 114.71 205.39 124.2 192.76 124.2 180.13 124.2 171.14 114.71 171.14 103 171.14 91.29 180.14 81.81 192.76 81.81 205.38 81.81 214.39 91.31 214.39 103M192.76 92.21C186.812 92.1603 181.95 96.9417 181.9 102.89 181.851 108.838 186.632 113.7 192.58 113.749 198.528 113.799 203.39 109.018 203.44 103.07 203.44 103.046 203.44 103.023 203.44 103 203.54 97.1577 198.884 92.3407 193.042 92.2411 192.948 92.2394 192.854 92.2391 192.76 92.24" fill="#FFFFFF"/><path d="M116.14 91.81C113.504 91.0821 110.793 90.6627 108.06 90.56 103.92 90.56 101.67 91.95 101.67 93.92 101.67 96.41 104.67 97.28 106.41 97.82L109.26 98.72C115.96 100.86 119.02 105.45 119.02 110.43 119.02 120.72 110.02 124.17 102.02 124.17 98.277 124.137 94.5448 123.762 90.87 123.05L90.87 113.63C94.041 114.556 97.3179 115.07 100.62 115.16 105.76 115.16 108.13 113.65 108.13 111.33 108.13 109.26 106.08 108.06 103.52 107.26L101.31 106.54C95.56 104.72 90.77 101.34 90.77 94.54 90.77 86.88 96.5 81.74 106.02 81.74 109.415 81.7873 112.794 82.2234 116.09 83.04Z" fill="#FFFFFF"/><path d="M10.26 38.51C10.26 35.6768 7.96322 33.38 5.13 33.38 2.29678 33.38 0 35.6768 0 38.51L0 49.26C0 52.0932 2.29678 54.39 5.13 54.39 7.96322 54.39 10.26 52.0932 10.26 49.26Z" fill="#FFFFFF"/><path d="M38.43 24.41C38.43 21.5768 36.1332 19.28 33.3 19.28 30.4668 19.28 28.17 21.5768 28.17 24.41L28.17 49.26C28.17 52.0932 30.4668 54.39 33.3 54.39 36.1332 54.39 38.43 52.0932 38.43 49.26Z" fill="#FFFFFF"/><path d="M66.6 5.11C66.6 2.27678 64.3032-0.02 61.47-0.02 58.6368-0.02 56.34 2.27678 56.34 5.11L56.34 59.47C56.34 62.3032 58.6368 64.6 61.47 64.6 64.3032 64.6 66.6 62.3032 66.6 59.47Z" fill="#FFFFFF"/><path d="M94.77 24.41C94.77 21.5768 92.4732 19.28 89.64 19.28 86.8068 19.28 84.51 21.5768 84.51 24.41L84.51 49.26C84.51 52.0932 86.8068 54.39 89.64 54.39 92.4732 54.39 94.77 52.0932 94.77 49.26Z" fill="#FFFFFF"/><path d="M122.91 38.51C122.785 35.6851 120.394 33.4963 117.569 33.6212 114.919 33.7384 112.797 35.8601 112.68 38.51L112.68 49.26C112.555 52.0849 114.744 54.4763 117.569 54.6012 120.394 54.7262 122.785 52.5374 122.91 49.7124Z" fill="#FFFFFF"/><path d="M151.09 24.41C151.09 21.5878 148.802 19.3 145.98 19.3 143.158 19.3 140.87 21.5878 140.87 24.41L140.87 49.26C140.87 52.0822 143.158 54.37 145.98 54.37 148.802 54.37 151.09 52.0822 151.09 49.26Z" fill="#FFFFFF"/><path d="M179.28 5.11C179.28 2.28783 176.992 0 174.17 0 171.348 0 169.06 2.28783 169.06 5.11L169.06 59.47C169.06 62.2922 171.348 64.58 174.17 64.58 176.992 64.58 179.28 62.2922 179.28 59.47Z" fill="#FFFFFF"/><path d="M207.47 24.41C207.345 21.5685 204.94 19.3666 202.098 19.4919 199.432 19.6094 197.298 21.744 197.18 24.41L197.18 49.26C197.305 52.1015 199.71 54.3034 202.552 54.1781 205.218 54.0606 207.352 51.926 207.47 49.26Z" fill="#FFFFFF"/><path d="M235.59 38.51C235.465 35.6851 233.074 33.4963 230.249 33.6212 227.599 33.7384 225.477 35.8601 225.36 38.51L225.36 49.26C225.235 52.0849 227.424 54.4763 230.249 54.6012 233.074 54.7262 235.465 52.5374 235.59 49.7124Z" fill="#FFFFFF"/></g></g></g></svg></div>
+    <div class="northstar-badge">RRA · Defend + Accelerate <span class="sep">·</span> Play To Win / Think Really Big</div>
+    <div class="gradient-bar"></div>
+    <div class="slide-eyebrow">Cynthia · Delivery · Active Epics &amp; Near-Term Deliverables</div>
+    <div class="slide-title">Committed deliverables</div>
+    <div class="slide-subtitle">Six epics currently in flight or shipped &mdash; targeting the largest late-renewal and pricing gaps.</div>
+
+    <div class="epic-grid">
+      <div class="egh">Epic</div>
+      <div class="egh">Focus</div>
+      <div class="egh">Status / Timeline</div>
+      <div class="egh">Requestor</div>
+
+      <div class="egc"><strong>31657</strong> Discover More Renewals</div>
+      <div class="egc">Help partners find what to renew</div>
+      <div class="egc status-progress">Intake / PRD complete; co-design with partners &mdash; target <strong>March</strong></div>
+      <div class="egc">Eric Calhoun</div>
+
+      <div class="egc"><strong>10157</strong> TnC+ &amp; SaaS during grace period</div>
+      <div class="egc">Close late-renewal revenue gap</div>
+      <div class="egc status-delivered">Delivered</div>
+      <div class="egc">Renewals Sales Leadership</div>
+
+      <div class="egc"><strong>10915-EA</strong></div>
+      <div class="egc">Late renewals (EA)</div>
+      <div class="egc status-progress">Phase 1 live · Phase 2 <strong>Sep</strong> · Phase 3 <strong>Nov</strong></div>
+      <div class="egc">Renewals Sales Leadership</div>
+
+      <div class="egc"><strong>20186</strong> SWAGPE</div>
+      <div class="egc">Beyond grace period w/ governance</div>
+      <div class="egc status-planned">Target <strong>Dec</strong></div>
+      <div class="egc">Renewals Sales Leadership</div>
+
+      <div class="egc"><strong>10186</strong> · <strong>29610</strong></div>
+      <div class="egc">Pricing and Discounting Policy Enforcement</div>
+      <div class="egc status-progress">Partially Delivered</div>
+      <div class="egc">Renewals Sales Leadership + BEs</div>
+    </div>
+    <div class="footnote-pill">Blocker on late-renewal epics: Revenue Accounting requirements have added significant scope and complexity.</div>
+  </div>
+  <div class="notes-panel">Cynthia v3 · Slide 3 — Committed Deliverables (from transactability-scope-readout.html §5). Six epics — three shipped, two landing Sep–Dec, one targeting March. Table brings the concrete delivery view into the member deck for viewers who want the epic-level detail. The RevAcct blocker pill ties directly to Theme 1 on Slide 2 (What we're working through).</div>
 </div>
 <div class="slide member ammar">
   <div class="slide-inner">
@@ -2526,6 +2700,64 @@ html,body {
     </div>
   </div>
   <div class="notes-panel">Marirosa's 'what we're working through' slide. Themes 1 and 2 (platform-team downstream surface + parallel capability programs) are combined into a single Theme 1 because both describe the same underlying reality — multiple sources of change landing on one audience. Grid overridden to 3 columns so all three themes sit side-by-side. 'In flight across' replaces 'Blocks' throughout.</div>
+</div>
+<div class="slide member marirosa">
+  <div class="slide-inner">
+    <a class="back-to-scopes" data-goto="4" role="button" tabindex="0">&larr; Back to Team Member Scopes</a>
+    <div class="cisco-logo logo-content"><svg viewBox="0 0 235.59 124.17" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" overflow="hidden"><g><g><g><rect x="66.63" y="82.51" width="10.33" height="40.94" fill="#FFFFFF"/><path d="M160.26 94.24C157.594 92.7891 154.605 92.0357 151.57 92.05 144.89 92.05 140.26 96.7 140.26 102.97 140.26 109.05 144.69 113.9 151.57 113.9 154.601 113.904 157.586 113.158 160.26 111.73L160.26 122.73C157.208 123.673 154.034 124.164 150.84 124.19 139.22 124.19 129.03 116.19 129.03 102.99 129.03 90.77 138.25 81.8 150.84 81.8 154.036 81.8088 157.213 82.3044 160.26 83.27Z" fill="#FFFFFF"/><path d="M52.43 94.24C49.7693 92.7854 46.7823 92.0317 43.75 92.05 37.06 92.05 32.43 96.7 32.43 102.97 32.43 109.05 36.87 113.9 43.75 113.9 46.7789 113.911 49.7625 113.165 52.43 111.73L52.43 122.73C49.3745 123.671 46.197 124.156 43 124.17 31.39 124.17 21.2 116.17 21.2 102.97 21.2 90.75 30.43 81.78 43 81.78 46.1966 81.7866 49.3734 82.2823 52.42 83.25Z" fill="#FFFFFF"/><path d="M214.39 103C214.39 114.71 205.39 124.2 192.76 124.2 180.13 124.2 171.14 114.71 171.14 103 171.14 91.29 180.14 81.81 192.76 81.81 205.38 81.81 214.39 91.31 214.39 103M192.76 92.21C186.812 92.1603 181.95 96.9417 181.9 102.89 181.851 108.838 186.632 113.7 192.58 113.749 198.528 113.799 203.39 109.018 203.44 103.07 203.44 103.046 203.44 103.023 203.44 103 203.54 97.1577 198.884 92.3407 193.042 92.2411 192.948 92.2394 192.854 92.2391 192.76 92.24" fill="#FFFFFF"/><path d="M116.14 91.81C113.504 91.0821 110.793 90.6627 108.06 90.56 103.92 90.56 101.67 91.95 101.67 93.92 101.67 96.41 104.67 97.28 106.41 97.82L109.26 98.72C115.96 100.86 119.02 105.45 119.02 110.43 119.02 120.72 110.02 124.17 102.02 124.17 98.277 124.137 94.5448 123.762 90.87 123.05L90.87 113.63C94.041 114.556 97.3179 115.07 100.62 115.16 105.76 115.16 108.13 113.65 108.13 111.33 108.13 109.26 106.08 108.06 103.52 107.26L101.31 106.54C95.56 104.72 90.77 101.34 90.77 94.54 90.77 86.88 96.5 81.74 106.02 81.74 109.415 81.7873 112.794 82.2234 116.09 83.04Z" fill="#FFFFFF"/><path d="M10.26 38.51C10.26 35.6768 7.96322 33.38 5.13 33.38 2.29678 33.38 0 35.6768 0 38.51L0 49.26C0 52.0932 2.29678 54.39 5.13 54.39 7.96322 54.39 10.26 52.0932 10.26 49.26Z" fill="#FFFFFF"/><path d="M38.43 24.41C38.43 21.5768 36.1332 19.28 33.3 19.28 30.4668 19.28 28.17 21.5768 28.17 24.41L28.17 49.26C28.17 52.0932 30.4668 54.39 33.3 54.39 36.1332 54.39 38.43 52.0932 38.43 49.26Z" fill="#FFFFFF"/><path d="M66.6 5.11C66.6 2.27678 64.3032-0.02 61.47-0.02 58.6368-0.02 56.34 2.27678 56.34 5.11L56.34 59.47C56.34 62.3032 58.6368 64.6 61.47 64.6 64.3032 64.6 66.6 62.3032 66.6 59.47Z" fill="#FFFFFF"/><path d="M94.77 24.41C94.77 21.5768 92.4732 19.28 89.64 19.28 86.8068 19.28 84.51 21.5768 84.51 24.41L84.51 49.26C84.51 52.0932 86.8068 54.39 89.64 54.39 92.4732 54.39 94.77 52.0932 94.77 49.26Z" fill="#FFFFFF"/><path d="M122.91 38.51C122.785 35.6851 120.394 33.4963 117.569 33.6212 114.919 33.7384 112.797 35.8601 112.68 38.51L112.68 49.26C112.555 52.0849 114.744 54.4763 117.569 54.6012 120.394 54.7262 122.785 52.5374 122.91 49.7124Z" fill="#FFFFFF"/><path d="M151.09 24.41C151.09 21.5878 148.802 19.3 145.98 19.3 143.158 19.3 140.87 21.5878 140.87 24.41L140.87 49.26C140.87 52.0822 143.158 54.37 145.98 54.37 148.802 54.37 151.09 52.0822 151.09 49.26Z" fill="#FFFFFF"/><path d="M179.28 5.11C179.28 2.28783 176.992 0 174.17 0 171.348 0 169.06 2.28783 169.06 5.11L169.06 59.47C169.06 62.2922 171.348 64.58 174.17 64.58 176.992 64.58 179.28 62.2922 179.28 59.47Z" fill="#FFFFFF"/><path d="M207.47 24.41C207.345 21.5685 204.94 19.3666 202.098 19.4919 199.432 19.6094 197.298 21.744 197.18 24.41L197.18 49.26C197.305 52.1015 199.71 54.3034 202.552 54.1781 205.218 54.0606 207.352 51.926 207.47 49.26Z" fill="#FFFFFF"/><path d="M235.59 38.51C235.465 35.6851 233.074 33.4963 230.249 33.6212 227.599 33.7384 225.477 35.8601 225.36 38.51L225.36 49.26C225.235 52.0849 227.424 54.4763 230.249 54.6012 233.074 54.7262 235.465 52.5374 235.59 49.7124Z" fill="#FFFFFF"/></g></g></g></svg></div>
+    <div class="northstar-badge">RRA · Defend + Scale <span class="sep">·</span> Play To Win / Drive Durable Growth</div>
+    <div class="gradient-bar"></div>
+    <div class="slide-eyebrow">Marirosa · Release Readiness · FY27 Schedule</div>
+    <div class="slide-title">Upcoming release schedule</div>
+    <div class="slide-subtitle">The next four releases across Renewals Console + Commerce Platforms &mdash; what's landing, when, and where we're waiting on IT.</div>
+
+    <div class="release-timeline">
+      <div class="release-card">
+        <div class="rc-date-pill">Sep 3</div>
+        <div class="rc-channel">Renewals Console + Commerce</div>
+        <ul class="rc-items">
+          <li><strong>Renewals Console / Console Home</strong> &mdash; Digital insights widget enhancement · Target Strategies.</li>
+          <li><strong>CCW / CCWR</strong> &mdash; Critical Infrastructure (SCI) · Late EA Renewals Gap Charges · Non-Standard Term Letter.</li>
+        </ul>
+      </div>
+
+      <div class="release-card">
+        <div class="rc-date-pill">Sep 17</div>
+        <div class="rc-channel">Mid-month release</div>
+        <ul class="rc-items">
+          <li><strong>ATR Merge Workflow</strong></li>
+          <li><strong>URM Metrics Visibility in Tools</strong> &mdash; EAMP · MBR · MDM · Exec Console · Visibility · Commerce.</li>
+        </ul>
+      </div>
+
+      <div class="release-card">
+        <div class="rc-date-pill">Oct 8</div>
+        <div class="rc-channel">Renewals Console</div>
+        <ul class="rc-items">
+          <li><strong>Meraki Co-Term Data update</strong></li>
+          <li><strong>Target Strategies for Renewal Leaders</strong> release</li>
+        </ul>
+      </div>
+
+      <div class="release-card tbd">
+        <div class="rc-date-pill tbd">Nov TBD</div>
+        <div class="rc-channel">Awaiting IT commit</div>
+        <div class="rc-tbd-body">Content mix locks 6&ndash;7 weeks before the release date.</div>
+      </div>
+    </div>
+
+    <div class="cadence-strip">
+      <div class="cs-item">
+        <div class="cs-label">Monthly Cadence</div>
+        <div class="cs-body">Renewals Console + Commerce Platforms release typically in the <strong>first 10 days</strong> of the month.</div>
+      </div>
+      <div class="cs-item">
+        <div class="cs-label">IT Commit Timing</div>
+        <div class="cs-body">Content included in each release is committed <strong>6&ndash;7 weeks prior</strong> to the release date.</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes-panel">Marirosa Slide 3 — FY27 upcoming release schedule shown as a horizontal timeline. Four milestones: Sep 3 (Renewals Console + Commerce), Sep 17 (mid-month for ATR merge + URM metrics visibility), Oct 8 (Renewals Console), Nov TBD (awaiting IT commit). Cadence info strip at the bottom explains the standard monthly rhythm (first 10 days) and the IT commit lead time (6–7 weeks prior). This slide answers Roshin's ask for the release schedule extending as far into FY27 as we have visibility.</div>
 </div>
 </div><!-- /deck -->
 
