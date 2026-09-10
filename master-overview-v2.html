@@ -972,6 +972,47 @@ html,body {
 }
 .barrier-card .b-blocks strong { color:var(--accent-orange); }
 .barrier-card.critical .b-blocks strong { color:var(--accent-magenta); }
+
+/* Brutal list (Slide 3) — 2-column exhaustive enumeration */
+.brutal-list {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+  margin-top:12px;
+}
+.bl-col {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-top:3px solid var(--cisco-blue);
+  border-radius:8px;
+  padding:12px 14px;
+  display:flex; flex-direction:column;
+}
+.bl-col.metrics { border-top-color:var(--status-green); }
+.bl-col .bl-label {
+  font-size:0.68rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  margin-bottom:5px;
+  color:var(--cisco-blue);
+}
+.bl-col.metrics .bl-label { color:var(--status-green); }
+.bl-col .bl-title {
+  font-size:0.9rem; font-weight:900;
+  color:var(--text-primary);
+  margin-bottom:8px;
+  line-height:1.25;
+}
+.bl-col ul { padding-left:0; list-style:none; margin:0; }
+.bl-col li {
+  font-size:0.74rem; line-height:1.45;
+  color:var(--text-secondary);
+  padding-left:12px; position:relative;
+  margin-bottom:5px;
+}
+.bl-col li::before {
+  content:"›"; position:absolute; left:0;
+  color:var(--cisco-blue); font-weight:700;
+}
+.bl-col.metrics li::before { color:var(--status-green); }
+.bl-col li strong { color:var(--text-primary); font-weight:700; }
 </style>
 <style>
 /* Input Channels citation footer (framework §3) */
@@ -1272,6 +1313,53 @@ html,body {
 }
 .barrier-card .b-blocks strong { color:var(--accent-orange); }
 .barrier-card.critical .b-blocks strong { color:var(--accent-magenta); }
+
+/* Brutal list (Slide 3) — 2-column exhaustive enumeration per Greg's direction */
+.brutal-list {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+  margin-top:12px;
+}
+.bl-col {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-top:3px solid var(--cisco-blue);
+  border-radius:8px;
+  padding:12px 14px;
+  display:flex; flex-direction:column;
+}
+.bl-col.mig { border-top-color:var(--accent-orange); }
+.bl-col.cap { border-top-color:var(--status-green); }
+.bl-col .bl-label {
+  font-size:0.68rem; font-weight:700;
+  letter-spacing:0.1em; text-transform:uppercase;
+  margin-bottom:5px;
+  color:var(--cisco-blue);
+}
+.bl-col.mig .bl-label { color:var(--accent-orange); }
+.bl-col.cap .bl-label { color:var(--status-green); }
+.bl-col .bl-title {
+  font-size:0.9rem; font-weight:900;
+  color:var(--text-primary);
+  margin-bottom:8px;
+  line-height:1.25;
+}
+.bl-col ul { padding-left:0; list-style:none; margin:0; }
+.bl-col li {
+  font-size:0.74rem; line-height:1.45;
+  color:var(--text-secondary);
+  padding-left:12px; position:relative;
+  margin-bottom:5px;
+}
+.bl-col li::before {
+  content:"›"; position:absolute; left:0;
+  color:var(--cisco-blue); font-weight:700;
+}
+.bl-col.mig li::before { color:var(--accent-orange); }
+.bl-col.cap li::before { color:var(--status-green); }
+.bl-col li strong { color:var(--text-primary); font-weight:700; }
+.bl-col li em {
+  color:var(--muted); font-style:italic; font-size:0.72rem;
+}
 </style>
 <style>
 /* Input Channels citation footer (framework §3) */
@@ -1480,7 +1568,7 @@ html,body {
   margin-bottom:5px;
 }
 .rc-items li::before {
-  content:"A";
+  content:"›";
   position:absolute; left:0;
   color:var(--cisco-blue); font-weight:700;
 }
@@ -1729,21 +1817,21 @@ html,body {
           <span class="chip status-live-link">Open Member Deck &rarr;</span>
         </div>
       </div>
-      <div class="big-tile mem clickable" data-goto="16" role="button" tabindex="0">
+      <div class="big-tile mem clickable" data-goto="17" role="button" tabindex="0">
         <div class="bt-eyebrow">Cynthia · Drives Defend + Accelerate</div>
         <div class="bt-title">Transactability · Policy</div>
         <div class="bt-line">Optimizing commerce transactions through the system · rules that make every step predictable.</div>        <div class="bt-meta">
           <span class="chip status-live-link">Open Member Deck &rarr;</span>
         </div>
       </div>
-      <div class="big-tile mem clickable" data-goto="21" role="button" tabindex="0">
+      <div class="big-tile mem clickable" data-goto="23" role="button" tabindex="0">
         <div class="bt-eyebrow">Marirosa · Drives Defend + Scale</div>
         <div class="bt-title">CRM/Core Tools · Release Readiness</div>
         <div class="bt-line">Systems sellers actually work in &mdash; accurate, connected, usable · every release lands cleanly.</div>        <div class="bt-meta">
           <span class="chip status-live-link">Open Member Deck &rarr;</span>
         </div>
       </div>
-      <div class="big-tile mem clickable" data-goto="19" role="button" tabindex="0">
+      <div class="big-tile mem clickable" data-goto="20" role="button" tabindex="0">
         <div class="bt-eyebrow">Ammar · Drives Scale + Automation &amp; Efficiency</div>
         <div class="bt-title">Seller Processes · Automation &amp; Scalability</div>
         <div class="bt-line">End-to-end flow simplified · building efficiency in the volume business.</div>        <div class="bt-meta">
@@ -2305,6 +2393,64 @@ html,body {
   </div>
   <div class="notes-panel">Jason's 'what we're working through' slide. Themes 2 and 3 combined into a single Theme 2 because both are execution constraints on the Sales Motion Metrics side — RRABIT capacity and Cortex technical boundaries are two facets of the same delivery-shaping problem. Grid overridden to 3 columns so all three themes sit side-by-side. 'In flight across' replaces 'Blocks' throughout.</div>
 </div>
+<div class="slide member jason">
+  <div class="slide-inner">
+    <a class="back-to-scopes" data-goto="4" role="button" tabindex="0">&larr; Back to Team Member Scopes</a>
+    <div class="cisco-logo logo-content"><svg viewBox="0 0 235.59 124.17" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" overflow="hidden"><g><g><g><rect x="66.63" y="82.51" width="10.33" height="40.94" fill="#FFFFFF"/><path d="M160.26 94.24C157.594 92.7891 154.605 92.0357 151.57 92.05 144.89 92.05 140.26 96.7 140.26 102.97 140.26 109.05 144.69 113.9 151.57 113.9 154.601 113.904 157.586 113.158 160.26 111.73L160.26 122.73C157.208 123.673 154.034 124.164 150.84 124.19 139.22 124.19 129.03 116.19 129.03 102.99 129.03 90.77 138.25 81.8 150.84 81.8 154.036 81.8088 157.213 82.3044 160.26 83.27Z" fill="#FFFFFF"/><path d="M52.43 94.24C49.7693 92.7854 46.7823 92.0317 43.75 92.05 37.06 92.05 32.43 96.7 32.43 102.97 32.43 109.05 36.87 113.9 43.75 113.9 46.7789 113.911 49.7625 113.165 52.43 111.73L52.43 122.73C49.3745 123.671 46.197 124.156 43 124.17 31.39 124.17 21.2 116.17 21.2 102.97 21.2 90.75 30.43 81.78 43 81.78 46.1966 81.7866 49.3734 82.2823 52.42 83.25Z" fill="#FFFFFF"/><path d="M214.39 103C214.39 114.71 205.39 124.2 192.76 124.2 180.13 124.2 171.14 114.71 171.14 103 171.14 91.29 180.14 81.81 192.76 81.81 205.38 81.81 214.39 91.31 214.39 103M192.76 92.21C186.812 92.1603 181.95 96.9417 181.9 102.89 181.851 108.838 186.632 113.7 192.58 113.749 198.528 113.799 203.39 109.018 203.44 103.07 203.44 103.046 203.44 103.023 203.44 103 203.54 97.1577 198.884 92.3407 193.042 92.2411 192.948 92.2394 192.854 92.2391 192.76 92.24" fill="#FFFFFF"/><path d="M116.14 91.81C113.504 91.0821 110.793 90.6627 108.06 90.56 103.92 90.56 101.67 91.95 101.67 93.92 101.67 96.41 104.67 97.28 106.41 97.82L109.26 98.72C115.96 100.86 119.02 105.45 119.02 110.43 119.02 120.72 110.02 124.17 102.02 124.17 98.277 124.137 94.5448 123.762 90.87 123.05L90.87 113.63C94.041 114.556 97.3179 115.07 100.62 115.16 105.76 115.16 108.13 113.65 108.13 111.33 108.13 109.26 106.08 108.06 103.52 107.26L101.31 106.54C95.56 104.72 90.77 101.34 90.77 94.54 90.77 86.88 96.5 81.74 106.02 81.74 109.415 81.7873 112.794 82.2234 116.09 83.04Z" fill="#FFFFFF"/><path d="M10.26 38.51C10.26 35.6768 7.96322 33.38 5.13 33.38 2.29678 33.38 0 35.6768 0 38.51L0 49.26C0 52.0932 2.29678 54.39 5.13 54.39 7.96322 54.39 10.26 52.0932 10.26 49.26Z" fill="#FFFFFF"/><path d="M38.43 24.41C38.43 21.5768 36.1332 19.28 33.3 19.28 30.4668 19.28 28.17 21.5768 28.17 24.41L28.17 49.26C28.17 52.0932 30.4668 54.39 33.3 54.39 36.1332 54.39 38.43 52.0932 38.43 49.26Z" fill="#FFFFFF"/><path d="M66.6 5.11C66.6 2.27678 64.3032-0.02 61.47-0.02 58.6368-0.02 56.34 2.27678 56.34 5.11L56.34 59.47C56.34 62.3032 58.6368 64.6 61.47 64.6 64.3032 64.6 66.6 62.3032 66.6 59.47Z" fill="#FFFFFF"/><path d="M94.77 24.41C94.77 21.5768 92.4732 19.28 89.64 19.28 86.8068 19.28 84.51 21.5768 84.51 24.41L84.51 49.26C84.51 52.0932 86.8068 54.39 89.64 54.39 92.4732 54.39 94.77 52.0932 94.77 49.26Z" fill="#FFFFFF"/><path d="M122.91 38.51C122.785 35.6851 120.394 33.4963 117.569 33.6212 114.919 33.7384 112.797 35.8601 112.68 38.51L112.68 49.26C112.555 52.0849 114.744 54.4763 117.569 54.6012 120.394 54.7262 122.785 52.5374 122.91 49.7124Z" fill="#FFFFFF"/><path d="M151.09 24.41C151.09 21.5878 148.802 19.3 145.98 19.3 143.158 19.3 140.87 21.5878 140.87 24.41L140.87 49.26C140.87 52.0822 143.158 54.37 145.98 54.37 148.802 54.37 151.09 52.0822 151.09 49.26Z" fill="#FFFFFF"/><path d="M179.28 5.11C179.28 2.28783 176.992 0 174.17 0 171.348 0 169.06 2.28783 169.06 5.11L169.06 59.47C169.06 62.2922 171.348 64.58 174.17 64.58 176.992 64.58 179.28 62.2922 179.28 59.47Z" fill="#FFFFFF"/><path d="M207.47 24.41C207.345 21.5685 204.94 19.3666 202.098 19.4919 199.432 19.6094 197.298 21.744 197.18 24.41L197.18 49.26C197.305 52.1015 199.71 54.3034 202.552 54.1781 205.218 54.0606 207.352 51.926 207.47 49.26Z" fill="#FFFFFF"/><path d="M235.59 38.51C235.465 35.6851 233.074 33.4963 230.249 33.6212 227.599 33.7384 225.477 35.8601 225.36 38.51L225.36 49.26C225.235 52.0849 227.424 54.4763 230.249 54.6012 233.074 54.7262 235.465 52.5374 235.59 49.7124Z" fill="#FFFFFF"/></g></g></g></svg></div>
+    <div class="northstar-badge">RRA · Defend + Scale <span class="sep">·</span> Play To Win / Drive Durable Growth</div>
+    <div class="gradient-bar"></div>
+    <div class="slide-eyebrow">Jason · Full Scope · Bodies of Work in Flight</div>
+    <div class="slide-title">The exhaustive body of work</div>
+    <div class="slide-subtitle">Every distinct body of work I'm coordinating &mdash; some carry epic numbers, most don't. Enumerated so leadership sees the surface area, not just the named objectives.</div>
+
+    <div class="brutal-list">
+      <div class="bl-col">
+        <div class="bl-label">URM Expansion &amp; Cross-Functional Dependency Leadership</div>
+        <div class="bl-title">The connective tissue for URM launch and operational adoption</div>
+        <ul>
+          <li><strong>URM end-state design alignment</strong> &mdash; RRA-scope agreement with URM core team, SPO, GTM, RRA Finance, IT, OCC, Gong, UCD.</li>
+          <li><strong>URM launch date approval</strong> &mdash; the controlling dependency for everything downstream.</li>
+          <li><strong>Data migration planning</strong> &mdash; active milestones, dependencies, risk mitigation.</li>
+          <li><strong>NYR goaling integration</strong> &mdash; Renewals-scope readiness.</li>
+          <li><strong>Compensation integration</strong> &mdash; Renewals-scope readiness.</li>
+          <li><strong>Systems integration</strong> &mdash; Opportunity Management, CX attrition management, SMR tagging, Pre/Post OA operations.</li>
+          <li><strong>Enablement strategy</strong> &mdash; comms, live sessions, training on schedule.</li>
+          <li><strong>Adoption &amp; feedback reporting</strong> for leadership review.</li>
+          <li><strong>Transition to run-the-business ownership</strong> &mdash; exit criteria + plan.</li>
+          <li><strong>Dependency tracking</strong> across URM, OCC, UCD, Gong roadmaps.</li>
+          <li><strong>Governance forums</strong> for dependency &amp; risk management.</li>
+          <li><strong>Renewals inputs &amp; decisions</strong> into partner roadmaps (URM · OCC · UCD · Gong).</li>
+          <li><strong>Change-impact assessments</strong> on migration, reporting, UX, enablement.</li>
+          <li><strong>Risk escalation</strong> within agreed governance.</li>
+        </ul>
+      </div>
+
+      <div class="bl-col metrics">
+        <div class="bl-label">Sales Motion Metrics &amp; Productivity</div>
+        <div class="bl-title">Baseline the motion, launch the productivity initiatives that follow</div>
+        <ul>
+          <li><strong>Cycle-time indicator definition</strong> &mdash; leading + lagging metrics in scope.</li>
+          <li><strong>Priority use case: Active opportunity cycle-time baseline.</strong></li>
+          <li><strong>Priority use case: AI impact analysis.</strong></li>
+          <li><strong>Priority use case: Long-tail coverage analysis.</strong></li>
+          <li><strong>Data availability confirmation</strong> &mdash; with RRABIT + Cortex / D&amp;A.</li>
+          <li><strong>Development capacity confirmation</strong> &mdash; RRABIT bandwidth vs. competing reporting priorities.</li>
+          <li><strong>Executive sponsorship</strong> for top sales-motion use cases.</li>
+          <li><strong>Operational MVP development</strong> &mdash; co-develop priority use cases + iterate.</li>
+          <li><strong>Baseline measurements</strong> established for approved metrics.</li>
+          <li><strong>Findings presentation</strong> &mdash; relationships between leading indicators, cycle times, and business outcomes.</li>
+          <li><strong>Executive sign-off</strong> on productivity-improvement priorities.</li>
+          <li><strong>Productivity-improvement programs</strong> launched as prioritized.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom-banner banner-cisco-blue" style="margin-top:12px">
+      <strong>This is the full picture.</strong> Some items have epic numbers; many are bodies of work in their own right &mdash; each requires the same coordination, requirement-shaping, and stakeholder alignment as any of the "named" initiatives.
+    </div>
+  </div>
+  <div class="notes-panel">Jason Slide 3 — the 'brutal list', mirroring Ammar's Slide 3 pattern. Content drawn from RRA_SPO_FY27_Objectives_Briefing.pptx (URM Expansion & Launch, Sales Motion Metrics, and Dependency Leadership objectives). Two categories: (1) URM Expansion + Cross-Functional Dependency Leadership — the URM launch surface plus dependency management across URM, OCC, UCD, Gong roadmaps; (2) Sales Motion Metrics & Productivity — the measurable-baseline work and productivity-improvement follow-on. Enumerated so leadership sees the surface area, not just the named objectives.</div>
+</div>
 <div class="slide member cynthia">
   <div class="slide-inner">
     <a class="back-to-scopes" data-goto="4" role="button" tabindex="0">&larr; Back to Team Member Scopes</a>
@@ -2572,6 +2718,50 @@ html,body {
     </div>
   </div>
   <div class="notes-panel">Ammar's 'what we're working through' slide. Themes 2 and 3 combined into a single Theme 2 because both describe the same underlying reality — a broad portfolio with shared stakeholders where parallel capability programs (Gong/OCC/URM) contend for the same dev capacity. Grid overridden to 3 columns so all three themes sit side-by-side. 'In flight across' replaces 'Blocks' throughout.</div>
+</div>
+<div class="slide member ammar">
+  <div class="slide-inner">
+    <a class="back-to-scopes" data-goto="4" role="button" tabindex="0">&larr; Back to Team Member Scopes</a>
+    <div class="cisco-logo logo-content"><svg viewBox="0 0 235.59 124.17" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" overflow="hidden"><g><g><g><rect x="66.63" y="82.51" width="10.33" height="40.94" fill="#FFFFFF"/><path d="M160.26 94.24C157.594 92.7891 154.605 92.0357 151.57 92.05 144.89 92.05 140.26 96.7 140.26 102.97 140.26 109.05 144.69 113.9 151.57 113.9 154.601 113.904 157.586 113.158 160.26 111.73L160.26 122.73C157.208 123.673 154.034 124.164 150.84 124.19 139.22 124.19 129.03 116.19 129.03 102.99 129.03 90.77 138.25 81.8 150.84 81.8 154.036 81.8088 157.213 82.3044 160.26 83.27Z" fill="#FFFFFF"/><path d="M52.43 94.24C49.7693 92.7854 46.7823 92.0317 43.75 92.05 37.06 92.05 32.43 96.7 32.43 102.97 32.43 109.05 36.87 113.9 43.75 113.9 46.7789 113.911 49.7625 113.165 52.43 111.73L52.43 122.73C49.3745 123.671 46.197 124.156 43 124.17 31.39 124.17 21.2 116.17 21.2 102.97 21.2 90.75 30.43 81.78 43 81.78 46.1966 81.7866 49.3734 82.2823 52.42 83.25Z" fill="#FFFFFF"/><path d="M214.39 103C214.39 114.71 205.39 124.2 192.76 124.2 180.13 124.2 171.14 114.71 171.14 103 171.14 91.29 180.14 81.81 192.76 81.81 205.38 81.81 214.39 91.31 214.39 103M192.76 92.21C186.812 92.1603 181.95 96.9417 181.9 102.89 181.851 108.838 186.632 113.7 192.58 113.749 198.528 113.799 203.39 109.018 203.44 103.07 203.44 103.046 203.44 103.023 203.44 103 203.54 97.1577 198.884 92.3407 193.042 92.2411 192.948 92.2394 192.854 92.2391 192.76 92.24" fill="#FFFFFF"/><path d="M116.14 91.81C113.504 91.0821 110.793 90.6627 108.06 90.56 103.92 90.56 101.67 91.95 101.67 93.92 101.67 96.41 104.67 97.28 106.41 97.82L109.26 98.72C115.96 100.86 119.02 105.45 119.02 110.43 119.02 120.72 110.02 124.17 102.02 124.17 98.277 124.137 94.5448 123.762 90.87 123.05L90.87 113.63C94.041 114.556 97.3179 115.07 100.62 115.16 105.76 115.16 108.13 113.65 108.13 111.33 108.13 109.26 106.08 108.06 103.52 107.26L101.31 106.54C95.56 104.72 90.77 101.34 90.77 94.54 90.77 86.88 96.5 81.74 106.02 81.74 109.415 81.7873 112.794 82.2234 116.09 83.04Z" fill="#FFFFFF"/><path d="M10.26 38.51C10.26 35.6768 7.96322 33.38 5.13 33.38 2.29678 33.38 0 35.6768 0 38.51L0 49.26C0 52.0932 2.29678 54.39 5.13 54.39 7.96322 54.39 10.26 52.0932 10.26 49.26Z" fill="#FFFFFF"/><path d="M38.43 24.41C38.43 21.5768 36.1332 19.28 33.3 19.28 30.4668 19.28 28.17 21.5768 28.17 24.41L28.17 49.26C28.17 52.0932 30.4668 54.39 33.3 54.39 36.1332 54.39 38.43 52.0932 38.43 49.26Z" fill="#FFFFFF"/><path d="M66.6 5.11C66.6 2.27678 64.3032-0.02 61.47-0.02 58.6368-0.02 56.34 2.27678 56.34 5.11L56.34 59.47C56.34 62.3032 58.6368 64.6 61.47 64.6 64.3032 64.6 66.6 62.3032 66.6 59.47Z" fill="#FFFFFF"/><path d="M94.77 24.41C94.77 21.5768 92.4732 19.28 89.64 19.28 86.8068 19.28 84.51 21.5768 84.51 24.41L84.51 49.26C84.51 52.0932 86.8068 54.39 89.64 54.39 92.4732 54.39 94.77 52.0932 94.77 49.26Z" fill="#FFFFFF"/><path d="M122.91 38.51C122.785 35.6851 120.394 33.4963 117.569 33.6212 114.919 33.7384 112.797 35.8601 112.68 38.51L112.68 49.26C112.555 52.0849 114.744 54.4763 117.569 54.6012 120.394 54.7262 122.785 52.5374 122.91 49.7124Z" fill="#FFFFFF"/><path d="M151.09 24.41C151.09 21.5878 148.802 19.3 145.98 19.3 143.158 19.3 140.87 21.5878 140.87 24.41L140.87 49.26C140.87 52.0822 143.158 54.37 145.98 54.37 148.802 54.37 151.09 52.0822 151.09 49.26Z" fill="#FFFFFF"/><path d="M179.28 5.11C179.28 2.28783 176.992 0 174.17 0 171.348 0 169.06 2.28783 169.06 5.11L169.06 59.47C169.06 62.2922 171.348 64.58 174.17 64.58 176.992 64.58 179.28 62.2922 179.28 59.47Z" fill="#FFFFFF"/><path d="M207.47 24.41C207.345 21.5685 204.94 19.3666 202.098 19.4919 199.432 19.6094 197.298 21.744 197.18 24.41L197.18 49.26C197.305 52.1015 199.71 54.3034 202.552 54.1781 205.218 54.0606 207.352 51.926 207.47 49.26Z" fill="#FFFFFF"/><path d="M235.59 38.51C235.465 35.6851 233.074 33.4963 230.249 33.6212 227.599 33.7384 225.477 35.8601 225.36 38.51L225.36 49.26C225.235 52.0849 227.424 54.4763 230.249 54.6012 233.074 54.7262 235.465 52.5374 235.59 49.7124Z" fill="#FFFFFF"/></g></g></g></svg></div>
+    <div class="northstar-badge">RRA · Scale + Automation &amp; Efficiency <span class="sep">·</span> Drive Durable Growth</div>
+    <div class="gradient-bar"></div>
+    <div class="slide-eyebrow">Ammar · Full Scope · Bodies of Work in Flight</div>
+    <div class="slide-title">The exhaustive body of work</div>
+    <div class="slide-subtitle">Every distinct body of work I'm coordinating &mdash; some carry epic numbers, most don't. Enumerated so leadership sees the surface area, not just the named initiatives.</div>
+
+    <div class="brutal-list">
+      <div class="bl-col">
+        <div class="bl-label">Opportunity &amp; Pipeline Management</div>
+        <div class="bl-title">Everything that touches opportunities in flight</div>
+        <ul>
+          <li><strong>Automated opportunity creation</strong> &mdash; the auto-generation surface itself.</li>
+          <li><strong>Baseline ATR opp creation</strong> &mdash; FY27 continues; FY28 paused pending BATR migration.</li>
+          <li><strong>Grouping logic</strong> &mdash; new logic for OCC; exclusions carry over (sub-1000K, PIT, SMB EMEA); forward-looking narrative to field and geo teams.</li>
+          <li><strong>ATR merge workflow visibility</strong> &mdash; keep visibility intact through the transition.</li>
+          <li><strong>Forecast management processes</strong> &mdash; how the forecast rolls up.</li>
+        </ul>
+      </div>
+
+      <div class="bl-col cap">
+        <div class="bl-label">Capabilities · Coordination · Narrative</div>
+        <div class="bl-title">Building tomorrow's playground while telling today's story</div>
+        <ul>
+          <li><strong>AutoQuote promo requirements</strong> &mdash; run-the-business surface on automated quoting.</li>
+          <li><strong>Gong</strong> &mdash; capabilities being built; managing the difference of opinion between Gong's forecasting approach and current process.</li>
+          <li><strong>Splunk onboarding</strong> &mdash; Map &amp; Gap to Cisco systems.</li>
+          <li><strong>Discover more renewals</strong> &mdash; data + partner discovery model.</li>
+          <li><strong>Commerce roadmap + narrative</strong> &mdash; partnership with Cynthia.</li>
+          <li><strong>Release readiness alignment</strong> &mdash; partnership with Marirosa.</li>
+          <li><strong>Narrative creation</strong> across every initiative for RRA leadership.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom-banner banner-cisco-blue" style="margin-top:12px">
+      <strong>This is the full picture.</strong> Some items have epic numbers; many are bodies of work in their own right &mdash; each requires the same coordination, requirement-shaping, and stakeholder alignment as any of the "named" initiatives.
+    </div>
+  </div>
+  <div class="notes-panel">Ammar Slide 3 — the 'brutal list' per Greg's direction (meeting 3). Exhaustive enumeration of every distinct body of work Ammar is coordinating, including items without epic numbers. Three categories: (1) Opportunity & Pipeline Management, (2) Commerce Migration & Structural, (3) Capabilities · Coordination · Narrative. Greg's specific callouts are in the list: automated opp creation, grouping logic (new for OCC + carry-over exclusions), baseline ATR (FY27 continue / FY28 pause), Gong forecasting difference-of-opinion, ATR merge workflow visibility, pipeline & forecast management processes. 'More is more' — copy-pasted where appropriate; unnamed workstreams listed alongside named initiatives.</div>
 </div>
 <div class="slide member marirosa">
   <div class="slide-inner">
