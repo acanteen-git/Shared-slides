@@ -9,4 +9,5 @@ Leadership analysis decks and readouts.
 - [BATR Migration Options Comparison](https://acanteen-git.github.io/Shared-slides/batr-options-comparison.html)
 - [Multi-Quarter ATR Merge Analysis](https://acanteen-git.github.io/Shared-slides/multi-quarter-merge-analysis.html)
 - [Discounting End State — Renewals Story](https://acanteen-git.github.io/Shared-slides/discounting-end-state.html)
+- [OCC Cutover: Linked and Related Opportunities — EMEA](https://acanteen-git.github.io/Shared-slides/occ-atr-merge-linked-related-emea.html)
 
