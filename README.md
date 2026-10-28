@@ -10,4 +10,5 @@ Leadership analysis decks and readouts.
 - [Multi-Quarter ATR Merge Analysis](https://acanteen-git.github.io/Shared-slides/multi-quarter-merge-analysis.html)
 - [Discounting End State — Renewals Story](https://acanteen-git.github.io/Shared-slides/discounting-end-state.html)
 - [OCC Cutover: Linked and Related Opportunities — EMEA](https://acanteen-git.github.io/Shared-slides/occ-atr-merge-linked-related-emea.html)
+- [OCC Cutover: Linked and Related Opportunities — EMEA (v2, data as of 28 Oct)](https://acanteen-git.github.io/Shared-slides/occ-atr-merge-linked-related-emea-v2.html)
 
